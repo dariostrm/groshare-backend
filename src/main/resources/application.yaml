@@ -9,6 +9,9 @@ spring:
     driverClassName: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true #for debugging the generated sql+
+    hibernate:
+      ddl-auto: update #ORM
   h2:
     console:
       enabled: true
