@@ -1,17 +1,6 @@
-spring:
+ktor:
   application:
-    name: groshare
-  datasource:
-    url: jdbc:h2:mem:groshare
-    #url: jdbc:h2:file:/data/groshare
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true #for debugging the generated sql+
-    hibernate:
-      ddl-auto: update #ORM
-  h2:
-    console:
-      enabled: true
+    modules:
+      - dev.jakobdario.ApplicationKt.module
+  deployment:
+    port: 8080
