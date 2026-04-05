@@ -3,12 +3,13 @@ package dev.jakobdario
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
+import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
-suspend fun Application.module() {
+fun Application.module() {
 
     initialiseDatabase()
     configureSerialization()
@@ -25,9 +26,10 @@ fun Application.configureSerialization() {
     }
 }
 
-suspend fun initialiseDatabase() {
-    SqliteDatabase.executeUpdate(
-        """
+fun initialiseDatabase() {
+    runBlocking {
+        SqliteDatabase.executeUpdate(
+            """
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email VARCHAR(255) NOT NULL UNIQUE,
@@ -35,16 +37,21 @@ suspend fun initialiseDatabase() {
             password_hash TEXT NOT NULL
         )
         """.trimIndent()
-    ) {}
+        )
+    }
 
-    //test data, comment out after first run to avoid duplicates
-    val sql = """
-            insert into users (email, username, password_hash)
-            values (?, ?, ?)
-        """.trimIndent()
-    /*SqliteDatabase.executeUpdate(sql) {
-        setString(1, "test@gmail.com")
-        setString(2, "test")
-        setString(3, "test")
+
+    //test data, comment/uncomment if needed/not needed
+    /*runBlocking {
+        SqliteDatabase.executeUpdate(
+            """
+                insert into users (email, username, password_hash)
+                values (?, ?, ?)
+            """.trimIndent()
+        ) {
+            setString(1, "test@gmail.com")
+            setString(2, "test")
+            setString(3, "test")
+        }
     }*/
 }
