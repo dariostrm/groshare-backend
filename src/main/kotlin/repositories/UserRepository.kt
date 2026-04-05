@@ -1,10 +1,8 @@
 package dev.jakobdario.repositories
 
+import dev.jakobdario.SqliteDatabase
 import dev.jakobdario.User
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.sql.Connection
-import java.sql.DriverManager
+import java.sql.ResultSet
 
 interface UserRepository {
     suspend fun getUsers(): List<User>
@@ -16,93 +14,72 @@ interface UserRepository {
     suspend fun deleteUser(id: Int)
 }
 
-class UserRepositorySqlite(private val connection: Connection) : UserRepository {
-    private fun java.sql.ResultSet.toUser(): User {
-        return User(
-            id = this.getInt("id"),
-            email = this.getString("email"),
-            username = this.getString("username")
-        )
-    }
+private fun ResultSet.toUser(): User {
+    return User(
+        id = this.getInt("id"),
+        email = this.getString("email"),
+        username = this.getString("username")
+    )
+}
 
-    override suspend fun getUsers(): List<User> {
-        return withContext(Dispatchers.IO) {
-            connection.createStatement().use { statement ->
-                val resultSet = statement.executeQuery("SELECT * FROM users")
-                val users = mutableListOf<User>()
-                while (resultSet.next()) {
-                    users.add(resultSet.toUser())
-                }
-                users
-            }
-        }
-    }
+class UserRepositorySqlite() : UserRepository {
+
+    override suspend fun getUsers(): List<User> =
+        SqliteDatabase.executeQuery("SELECT * FROM users", map = ResultSet::toUser)
+
 
     override suspend fun getUserById(id: Int): User? {
-        return withContext(Dispatchers.IO) {
-
-            val sql = "SELECT * FROM users WHERE id = ?"
-            connection.prepareStatement(sql).use { statement ->
-                statement.setInt(1, id)
-                val resultSet = statement.executeQuery()
-                if (resultSet.next()) resultSet.toUser() else null
-            }
-        }
+        return SqliteDatabase.executeQuery(
+            "SELECT * FROM users WHERE id = ?",
+            map = ResultSet::toUser
+        ) {
+            setInt(1, id)
+        }.firstOrNull()
     }
 
     override suspend fun getUserByUsername(username: String): User? {
-        return withContext(Dispatchers.IO) {
-            val sql = "SELECT * FROM users WHERE username = ?"
-            connection.prepareStatement(sql).use { statement ->
-                statement.setString(1, username)
-                val resultSet = statement.executeQuery()
-                if (resultSet.next()) resultSet.toUser() else null
-            }
-        }
+        return SqliteDatabase.executeQuery(
+            "SELECT * FROM users WHERE username = ?",
+            map = ResultSet::toUser
+        ) {
+            setString(1, username)
+        }.firstOrNull()
     }
 
     override suspend fun getUserByEmail(email: String): User? {
-        return withContext(Dispatchers.IO) {
-            val sql = "SELECT * FROM users WHERE email = ?"
-            connection.prepareStatement(sql).use { statement ->
-                statement.setString(1, email)
-                val resultSet = statement.executeQuery()
-                if (resultSet.next()) resultSet.toUser() else null
-            }
-        }
+        return SqliteDatabase.executeQuery(
+            "SELECT * FROM users WHERE email = ?",
+            map = ResultSet::toUser
+        ) {
+            setString(1, email)
+        }.firstOrNull()
     }
 
     override suspend fun addUser(user: User, password: String) {
-       withContext(Dispatchers.IO) {
-            val sql = "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)"
-            connection.prepareStatement(sql).use { statement ->
-                statement.setString(1, user.email)
-                statement.setString(2, user.username)
-                statement.setString(3, password)
-                statement.executeUpdate()
-            }
+        SqliteDatabase.executeUpdate(
+            "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)"
+        ) {
+            setString(1, user.email)
+            setString(2, user.username)
+            setString(3, password)
         }
     }
 
     override suspend fun updateUser(user: User) {
-       withContext(Dispatchers.IO) {
-            val sql = "UPDATE users SET email = ?, username = ? WHERE id = ?"
-            connection.prepareStatement(sql).use { statement ->
-                statement.setString(1, user.email)
-                statement.setString(2, user.username)
-                statement.setInt(3, user.id)
-                statement.executeUpdate()
-            }
+        SqliteDatabase.executeUpdate(
+            "UPDATE users SET email = ?, username = ? WHERE id = ?"
+        ) {
+            setString(1, user.email)
+            setString(2, user.username)
+            setInt(3, user.id)
         }
     }
 
     override suspend fun deleteUser(id: Int) {
-        withContext(Dispatchers.IO) {
-            val sql = "DELETE FROM users WHERE id = ?"
-            connection.prepareStatement(sql).use { statement ->
-                statement.setInt(1, id)
-                statement.executeUpdate()
-            }
+        SqliteDatabase.executeUpdate(
+            "DELETE FROM users WHERE id = ?"
+        ) {
+            setInt(1, id)
         }
     }
 }

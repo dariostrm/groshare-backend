@@ -7,8 +7,8 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting(db: java.sql.Connection) {
-    val userRepository : UserRepository = UserRepositorySqlite(db)
+fun Application.configureRouting() {
+    val userRepository : UserRepository = UserRepositorySqlite()
     routing {
         get("/") {
             call.respondText("Hello World!")
