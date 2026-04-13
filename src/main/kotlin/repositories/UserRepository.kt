@@ -89,7 +89,7 @@ class UserRepositorySqlite() : UserRepository {
     override suspend fun checkUniqueEmail(email: String): Boolean {
         return SqliteDatabase.executeQuery(
             "SELECT id FROM users WHERE email = ?",
-            map = { getString("email") }
+            map = { getInt("id") }
         ) {
             setString(1, email)
         }.isEmpty()
