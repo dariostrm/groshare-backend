@@ -31,5 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
-/groshare.db
+/groshare_backend.db
 .gradle
+/requests.http

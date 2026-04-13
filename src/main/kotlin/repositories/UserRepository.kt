@@ -2,6 +2,7 @@ package dev.jakobdario.repositories
 
 import dev.jakobdario.SqliteDatabase
 import dev.jakobdario.User
+import dev.jakobdario.auth.Hash
 import java.sql.ResultSet
 
 interface UserRepository {
@@ -9,12 +10,15 @@ interface UserRepository {
     suspend fun getUserById(id: Int): User?
     suspend fun getUserByUsername(username: String): User?
     suspend fun getUserByEmail(email: String): User?
-    suspend fun addUser(user: User, password: String)
     suspend fun updateUser(user: User)
     suspend fun deleteUser(id: Int)
+    suspend fun checkUniqueUsername(username: String): Boolean
+    suspend fun checkUniqueEmail(email: String): Boolean
+    suspend fun checkPassword(userId: Int, check: (Hash) -> Boolean): Boolean
+    suspend fun signUp(username: String, email: String, hashedPassword: Hash) : User
 }
 
-private fun ResultSet.toUser(): User {
+fun ResultSet.toUser(): User {
     return User(
         id = this.getInt("id"),
         email = this.getString("email"),
@@ -55,16 +59,6 @@ class UserRepositorySqlite() : UserRepository {
         }.firstOrNull()
     }
 
-    override suspend fun addUser(user: User, password: String) {
-        SqliteDatabase.executeUpdate(
-            "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)"
-        ) {
-            setString(1, user.email)
-            setString(2, user.username)
-            setString(3, password)
-        }
-    }
-
     override suspend fun updateUser(user: User) {
         SqliteDatabase.executeUpdate(
             "UPDATE users SET email = ?, username = ? WHERE id = ?"
@@ -81,5 +75,44 @@ class UserRepositorySqlite() : UserRepository {
         ) {
             setInt(1, id)
         }
+    }
+
+    override suspend fun checkUniqueUsername(username: String): Boolean {
+        return SqliteDatabase.executeQuery(
+            "SELECT id FROM users WHERE username = ?",
+            map = { getInt("id") }
+        ) {
+            setString(1, username)
+        }.isEmpty()
+    }
+
+    override suspend fun checkUniqueEmail(email: String): Boolean {
+        return SqliteDatabase.executeQuery(
+            "SELECT id FROM users WHERE email = ?",
+            map = { getString("email") }
+        ) {
+            setString(1, email)
+        }.isEmpty()
+    }
+
+    override suspend fun checkPassword(userId: Int, check: (Hash) -> Boolean): Boolean {
+        val passwordHash = SqliteDatabase.executeQuery(
+            "SELECT password_hash FROM users WHERE id = ?",
+            map = { getString("password_hash") }
+        ) {
+            setInt(1, userId)
+        }.firstOrNull() ?: return false
+        return check(Hash(passwordHash))
+    }
+
+    override suspend fun signUp(username: String, email: String, hashedPassword: Hash) : User {
+        SqliteDatabase.executeUpdate(
+            "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)"
+        ) {
+            setString(1, email)
+            setString(2, username)
+            setString(3, hashedPassword.value)
+        }
+        return getUserByUsername(username) ?: throw IllegalStateException("User was not created")
     }
 }
