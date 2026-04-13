@@ -4,15 +4,10 @@ import dev.jakobdario.repositories.SessionRepository
 import dev.jakobdario.repositories.SessionRepositorySqlite
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.Authentication
-import io.ktor.server.auth.Principal
-import io.ktor.server.auth.UserIdPrincipal
-import io.ktor.server.auth.bearer
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.sessions.sessionId
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
-import java.util.UUID
+import java.util.*
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -62,6 +57,8 @@ fun Application.configureAuth(sessionRepository: SessionRepository) {
 
 fun configureDatabase() {
     runBlocking {
+        SqliteDatabase.executeUpdate("PRAGMA foreign_keys = ON;")
+
         SqliteDatabase.executeUpdate(
             """
             CREATE TABLE IF NOT EXISTS users (

@@ -21,11 +21,10 @@ data class SignUpRequest(val username: String, val email: String, val password: 
 @Serializable
 data class AuthResponse(val token: String)
 
-fun RoutingContext.getSession() : UserSessionPrincipal? {
-    return call.principal<UserSessionPrincipal>()
-}
-fun RoutingContext.getUserId() : Int? {
-    return getSession()?.userId
+fun RoutingContext.getSession() : UserSessionPrincipal {
+    return requireNotNull(call.principal<UserSessionPrincipal>()) {
+        "Authenticated route executed without a UserSessionPrincipal"
+    }
 }
 
 fun Route.authRoutes(
@@ -52,7 +51,7 @@ fun Route.authRoutes(
     post("/signup") {
         val request = try {
             call.receive<SignUpRequest>()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return@post call.respond(HttpStatusCode.BadRequest, "Invalid request body")
         }
 
@@ -73,15 +72,12 @@ fun Route.authRoutes(
     }
     authenticate() {
         get("/profile") {
-            val userId = getUserId()
-                ?: return@get call.respond(HttpStatusCode.Unauthorized, "Session expired, try logging in again")
-            val user = userRepository.getUserById(userId)
+            val user = userRepository.getUserById(getSession().userId)
                 ?: return@get call.respond(HttpStatusCode.NotFound, "The user was not found")
             call.respond("Hello ${user.username}")
         }
         post("/logout") {
             val session = getSession()
-                ?: return@post call.respond(HttpStatusCode.Unauthorized, "Session expired, try logging in again")
             sessionRepository.deleteSession(session.sessionId)
             call.respond(HttpStatusCode.OK, "Logged out successfully")
         }
