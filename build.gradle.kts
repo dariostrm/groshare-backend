@@ -27,6 +27,9 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.51.3.0")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation("io.ktor:ktor-server-auth")
+    implementation("io.ktor:ktor-server-swagger")
+    implementation("at.favre.lib:bcrypt:0.10.2")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
