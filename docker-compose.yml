@@ -1,0 +1,14 @@
+services:
+  ktor-backend:
+    environment:
+      - PORT=9090
+    build: . # Points to a Dockerfile running your Ktor app
+    # No ports need to be exposed to the host!
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    env_file: 
+      - /home/dariostream/secrets/cloudflare.env
+    depends_on:
+      - ktor-backend
