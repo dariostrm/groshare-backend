@@ -14,11 +14,12 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            text/plain:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/User"
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Hello World!"
   /api/v1/login:
     post:
       description: ""
@@ -69,7 +70,7 @@ paths:
                 type: "string"
               examples:
                 Example#1:
-                  value: "Session expired, try logging in again"
+                  value: "Unauthorized"
         "200":
           description: "OK"
           content:
@@ -85,15 +86,6 @@ paths:
       security:
         - BearerAuth: [ ]
       responses:
-        "401":
-          description: "Unauthorized"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Session expired, try logging in again"
         "404":
           description: "Not Found"
           content:
@@ -108,10 +100,56 @@ paths:
           content:
             '*/*':
               schema:
+                $ref: "#/components/schemas/Profile"
+    put:
+      description: "Updates the profile"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Profile"
+        required: true
+      security:
+        - BearerAuth: [ ]
+      responses:
+        "404":
+          description: "Not Found"
+          content:
+            '*/*':
+              schema:
                 type: "string"
               examples:
                 Example#1:
-                  value: ""
+                  value: "Your user was not found"
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid request body"
+        "409":
+          description: "Conflict"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Email is already taken"
+                Example#2:
+                  value: "Username is already taken"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Profile updated successfully"
   /api/v1/signup:
     post:
       description: ""
@@ -163,20 +201,6 @@ components:
       type: http
       scheme: bearer
   schemas:
-    User:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int32"
-        username:
-          type: "string"
-        email:
-          type: "string"
-      required:
-        - "id"
-        - "username"
-        - "email"
     LoginRequest:
       type: "object"
       properties:
@@ -194,6 +218,16 @@ components:
           type: "string"
       required:
         - "token"
+    Profile:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        email:
+          type: "string"
+      required:
+        - "username"
+        - "email"
     SignUpRequest:
       type: "object"
       properties:

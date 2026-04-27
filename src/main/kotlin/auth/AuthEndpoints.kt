@@ -1,17 +1,13 @@
 package dev.jakobdario.auth
 
-import dev.jakobdario.UserSessionPrincipal
+import dev.jakobdario.getSession
 import dev.jakobdario.repositories.SessionRepository
 import dev.jakobdario.repositories.UserRepository
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.principal
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.RoutingContext
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
+import io.ktor.http.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,12 +16,6 @@ data class LoginRequest(val username: String, val password: String)
 data class SignUpRequest(val username: String, val email: String, val password: String)
 @Serializable
 data class AuthResponse(val token: String)
-
-fun RoutingContext.getSession() : UserSessionPrincipal {
-    return requireNotNull(call.principal<UserSessionPrincipal>()) {
-        "Authenticated route executed without a UserSessionPrincipal"
-    }
-}
 
 fun Route.authRoutes(
     userRepository: UserRepository,
@@ -71,11 +61,6 @@ fun Route.authRoutes(
         }
     }
     authenticate() {
-        get("/profile") {
-            val user = userRepository.getUserById(getSession().userId)
-                ?: return@get call.respond(HttpStatusCode.NotFound, "The user was not found")
-            call.respond("Hello ${user.username}")
-        }
         post("/logout") {
             val session = getSession()
             sessionRepository.deleteSession(session.sessionId)
