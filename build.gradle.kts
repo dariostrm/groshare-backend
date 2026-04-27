@@ -30,6 +30,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth")
     implementation("io.ktor:ktor-server-swagger")
     implementation("at.favre.lib:bcrypt:0.10.2")
+    implementation("io.ktor:ktor-server-cors")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

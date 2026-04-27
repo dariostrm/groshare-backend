@@ -4,6 +4,7 @@ info:
   description: "groshare_backend API"
   version: "1.0.0"
 servers:
+  - url: "https://groshare.dariostrm.dev"
   - url: "http://localhost:8080"
 paths:
   /api/v1:
