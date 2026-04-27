@@ -62,6 +62,15 @@ paths:
       security:
         - BearerAuth: []
       responses:
+        "401":
+          description: "Unauthorized"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Unauthorized"
         "200":
           description: "OK"
           content:
