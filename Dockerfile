@@ -29,7 +29,7 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*-all.jar ./ktor-backend.jar
 
 # Tell Docker that this container listens on port 8080
-EXPOSE 8080
+EXPOSE 9090
 
 # The command that runs when the container starts
 CMD ["java", "-jar", "ktor-backend.jar"]
