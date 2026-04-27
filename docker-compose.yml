@@ -2,6 +2,9 @@ services:
   ktor-backend:
     environment:
       - PORT=9090
+      - JDBC_DATABASE_URL=jdbc:sqlite:/app/data/groshare_backend.db
+    volumes:
+      - ${HOME}/groshare:/app/data
     build: . # Points to a Dockerfile running your Ktor app
     # No ports need to be exposed to the host!
 
@@ -9,6 +12,6 @@ services:
     image: cloudflare/cloudflared:latest
     command: tunnel run
     env_file: 
-      - /home/dariostream/secrets/cloudflare.env
+      - ${HOME}/secrets/cloudflare.env
     depends_on:
       - ktor-backend

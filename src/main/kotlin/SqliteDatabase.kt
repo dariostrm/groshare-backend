@@ -9,7 +9,9 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 
 object SqliteDatabase {
-    val connection: Connection = DriverManager.getConnection("jdbc:sqlite:groshare_backend.db")
+
+    val dbUrl = System.getenv("JDBC_DATABASE_URL") ?: "jdbc:sqlite:groshare_backend.db"
+    val connection: Connection = DriverManager.getConnection(dbUrl)
 
     //only one request can use the sqlite database at the same time
     //this is enough for a school project, introducing connection pools would be overkill

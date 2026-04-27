@@ -2,10 +2,13 @@ package dev.jakobdario
 
 import dev.jakobdario.repositories.SessionRepository
 import dev.jakobdario.repositories.SessionRepositorySqlite
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.CORS
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -16,6 +19,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     val sessionRepo = SessionRepositorySqlite()
 
+    configureCors()
     configureDatabase()
     configureSerialization()
     configureAuth(sessionRepo)
@@ -29,6 +33,25 @@ fun Application.module() {
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
         json()
+    }
+}
+
+fun Application.configureCors() {
+    install(CORS) {
+        anyHost()
+
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+
+        allowNonSimpleContentTypes = true
+        allowCredentials = true
     }
 }
 
