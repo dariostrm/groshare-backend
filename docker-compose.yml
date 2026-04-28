@@ -4,8 +4,12 @@ services:
       - PORT=9090
       - JDBC_DATABASE_URL=jdbc:sqlite:/app/data/groshare_backend.db
     volumes:
-      - ${HOME}/groshare:/app/data
+      - ${HOME}/groshare/data:/app/data
     build: . # Points to a Dockerfile running your Ktor app
     # No ports need to be exposed to the host!
     networks:
       - groshare_network
+
+networks:
+  groshare_network:
+    external: true
