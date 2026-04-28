@@ -7,11 +7,5 @@ services:
       - ${HOME}/groshare:/app/data
     build: . # Points to a Dockerfile running your Ktor app
     # No ports need to be exposed to the host!
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel run
-    env_file: 
-      - ${HOME}/secrets/cloudflare.env
-    depends_on:
-      - ktor-backend
+    networks:
+      - groshare_network
