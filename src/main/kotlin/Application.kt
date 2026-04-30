@@ -88,7 +88,9 @@ fun configureDatabase() {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email VARCHAR(255) NOT NULL UNIQUE,
                 username TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL
+                password_hash TEXT NOT NULL,
+                apartment_id INTEGER,
+                FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE SET NULL
             )
             """.trimIndent()
         )
@@ -99,6 +101,30 @@ fun configureDatabase() {
                 user_id INT NOT NULL,
                 expires_at INTEGER NOT NULL, -- Unix Time (number of seconds since 1970-01-01)
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        SqliteDatabase.executeUpdate(
+            """
+            CREATE TABLE IF NOT EXISTS apartments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                address TEXT NOT NULL,
+                city TEXT NOT NULL
+            )
+            """.trimIndent()
+        )
+        SqliteDatabase.executeUpdate(
+            """
+            CREATE TABLE IF NOT EXISTS invites (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                apartment_id INTEGER NOT NULL,
+                inviter_id INTEGER NOT NULL,
+                invited_user_id INTEGER NOT NULL,
+                status TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'rejected')),
+                FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
+                FOREIGN KEY (inviter_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE
             )
             """.trimIndent()
         )

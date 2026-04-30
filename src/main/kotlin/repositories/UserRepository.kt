@@ -1,38 +1,38 @@
 package dev.jakobdario.repositories
 
 import dev.jakobdario.SqliteDatabase
-import dev.jakobdario.User
 import dev.jakobdario.auth.Hash
+import dev.jakobdario.entities.UserEntity
 import java.sql.ResultSet
 
 interface UserRepository {
-    suspend fun getUsers(): List<User>
-    suspend fun getUserById(id: Int): User?
-    suspend fun getUserByUsername(username: String): User?
-    suspend fun getUserByEmail(email: String): User?
-    suspend fun updateUser(user: User)
+    suspend fun getUsers(): List<UserEntity>
+    suspend fun getUserById(id: Int): UserEntity?
+    suspend fun getUserByUsername(username: String): UserEntity?
+    suspend fun updateUser(user: UserEntity)
     suspend fun deleteUser(id: Int)
     suspend fun checkUniqueUsername(username: String): Boolean
     suspend fun checkUniqueEmail(email: String): Boolean
     suspend fun checkPassword(userId: Int, check: (Hash) -> Boolean): Boolean
-    suspend fun signUp(username: String, email: String, hashedPassword: Hash) : User
+    suspend fun signUp(username: String, email: String, hashedPassword: Hash) : UserEntity
 }
 
-fun ResultSet.toUser(): User {
-    return User(
+fun ResultSet.toUser(): UserEntity {
+    return UserEntity(
         id = this.getInt("id"),
         email = this.getString("email"),
-        username = this.getString("username")
+        username = this.getString("username"),
+        apartmentId = try { this.getInt("apartment_id") } catch (_: Exception) { null }
     )
 }
 
 class UserRepositorySqlite() : UserRepository {
 
-    override suspend fun getUsers(): List<User> =
+    override suspend fun getUsers(): List<UserEntity> =
         SqliteDatabase.executeQuery("SELECT * FROM users", map = ResultSet::toUser)
 
 
-    override suspend fun getUserById(id: Int): User? {
+    override suspend fun getUserById(id: Int): UserEntity? {
         return SqliteDatabase.executeQuery(
             "SELECT * FROM users WHERE id = ?",
             map = ResultSet::toUser
@@ -41,7 +41,7 @@ class UserRepositorySqlite() : UserRepository {
         }.firstOrNull()
     }
 
-    override suspend fun getUserByUsername(username: String): User? {
+    override suspend fun getUserByUsername(username: String): UserEntity? {
         return SqliteDatabase.executeQuery(
             "SELECT * FROM users WHERE username = ?",
             map = ResultSet::toUser
@@ -50,22 +50,16 @@ class UserRepositorySqlite() : UserRepository {
         }.firstOrNull()
     }
 
-    override suspend fun getUserByEmail(email: String): User? {
-        return SqliteDatabase.executeQuery(
-            "SELECT * FROM users WHERE email = ?",
-            map = ResultSet::toUser
-        ) {
-            setString(1, email)
-        }.firstOrNull()
-    }
-
-    override suspend fun updateUser(user: User) {
+    override suspend fun updateUser(user: UserEntity) {
         SqliteDatabase.executeUpdate(
             "UPDATE users SET email = ?, username = ? WHERE id = ?"
         ) {
             setString(1, user.email)
             setString(2, user.username)
-            setInt(3, user.id)
+            if (user.apartmentId == null)
+                setString(3, user.apartmentId)
+            else setNull(3, java.sql.Types.INTEGER)
+            setInt(4, user.id)
         }
     }
 
@@ -105,7 +99,7 @@ class UserRepositorySqlite() : UserRepository {
         return check(Hash(passwordHash))
     }
 
-    override suspend fun signUp(username: String, email: String, hashedPassword: Hash) : User {
+    override suspend fun signUp(username: String, email: String, hashedPassword: Hash) : UserEntity {
         SqliteDatabase.executeUpdate(
             "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)"
         ) {

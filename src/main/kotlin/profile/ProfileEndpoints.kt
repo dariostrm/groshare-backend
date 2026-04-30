@@ -1,6 +1,6 @@
 package dev.jakobdario.profile
 
-import dev.jakobdario.User
+import dev.jakobdario.entities.UserEntity
 import dev.jakobdario.getSession
 import dev.jakobdario.repositories.UserRepository
 import io.ktor.http.*
@@ -41,11 +41,14 @@ fun Route.profileRoutes(
                 return@put call.respond(HttpStatusCode.Conflict, "Email is already taken")
             }
 
-            userRepository.updateUser(User(
-                id = userId,
-                username = request.username,
-                email = request.email
-            ))
+            userRepository.updateUser(
+                UserEntity(
+                    id = userId,
+                    username = request.username,
+                    email = request.email,
+                    apartmentId = currentUser.apartmentId
+                )
+            )
             call.respond(HttpStatusCode.OK, "Profile updated successfully")
         }
     }
