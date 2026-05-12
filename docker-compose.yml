@@ -1,5 +1,6 @@
 services:
   ktor-backend:
+    restart: unless-stopped
     environment:
       - PORT=9090
       - JDBC_DATABASE_URL=jdbc:sqlite:/app/data/groshare_backend.db
