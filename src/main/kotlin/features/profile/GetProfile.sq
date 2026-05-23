@@ -1,0 +1,5 @@
+getProfile:
+SELECT user.username, user.email, apt.name
+FROM users user LEFT JOIN apartments apt
+ON user.apartment_id = apt.id
+WHERE user.id = :userId;

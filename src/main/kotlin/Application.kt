@@ -1,33 +1,56 @@
 package dev.jakobdario
 
-import dev.jakobdario.repositories.SessionRepository
-import dev.jakobdario.repositories.SessionRepositorySqlite
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import features.auth.configureAuth
+import dev.jakobdario.database.Database
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
+import io.ktor.server.netty.EngineMain
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.CORS
-import kotlinx.coroutines.runBlocking
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.ContentTransformationException
+import io.ktor.server.response.respond
+import io.ktor.utils.io.CancellationException
+import kotlinx.serialization.Serializable
+import shared.ErrorResponse
+import shared.UnauthorizedException
+import shared.validation.ValidationException
 import java.util.*
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {
-    val sessionRepo = SessionRepositorySqlite()
-
+    val database = configureDatabase()
     configureCors()
-    configureDatabase()
+    configureErrorHandling()
     configureSerialization()
-    configureAuth(sessionRepo)
-    configureRouting(sessionRepo)
+    configureAuth(database)
+    configureRouting(database)
+}
+
+fun Application.configureDatabase(): Database {
+    val dbUrl = System.getenv("JDBC_DATABASE_URL") ?: "jdbc:sqlite:groshare_backend.db"
+    val driver: SqlDriver = JdbcSqliteDriver(
+        url = dbUrl,
+        properties = Properties().apply {
+            put("foreign_keys", "true")
+            put("journal_mode", "WAL")
+            put("busy_timeout", "5000")
+        },
+        schema = Database.Schema,
+    )
     monitor.subscribe(ApplicationStopped) {
         println("Closing database...")
-        SqliteDatabase.close()
+        driver.close()
     }
+    return Database(driver)
 }
 
 fun Application.configureSerialization() {
@@ -55,52 +78,25 @@ fun Application.configureCors() {
     }
 }
 
-data class UserSessionPrincipal(
-    val userId: Int,
-    val sessionId: UUID
-)
-fun Application.configureAuth(sessionRepository: SessionRepository) {
-    install(Authentication) {
-        bearer {
-            realm = "GroShare"
-            authenticate { tokenCredential ->
-                val sessionId = try {
-                    UUID.fromString(tokenCredential.token)
-                } catch (e: IllegalArgumentException) {
-                    return@authenticate null
+fun Application.configureErrorHandling() {
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            when (cause) {
+                is CancellationException -> throw cause // Don't handle cancellations, they are used for timeouts and such
+
+                is ValidationException -> call.respond(HttpStatusCode.BadRequest,
+                    ErrorResponse(cause.message ?: "Validation error"))
+                is UnauthorizedException -> call.respond(HttpStatusCode.Unauthorized,
+                    ErrorResponse(cause.message ?: "Unauthorized"))
+                is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest,
+                    ErrorResponse("Invalid request format: ${cause.message}"))
+
+                else -> {
+                    call.application.environment.log.error("Unexpected error occurred", cause)
+                    call.respond(HttpStatusCode.InternalServerError,
+                        ErrorResponse("An unexpected error occurred: ${cause.message}"))
                 }
-                val userId = sessionRepository.getUserId(sessionId)
-                if (userId != null)
-                    UserSessionPrincipal(userId, sessionId)
-                else null
             }
         }
-    }
-}
-
-fun configureDatabase() {
-    runBlocking {
-        SqliteDatabase.executeUpdate("PRAGMA foreign_keys = ON;")
-
-        SqliteDatabase.executeUpdate(
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email VARCHAR(255) NOT NULL UNIQUE,
-                username TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL
-            )
-            """.trimIndent()
-        )
-        SqliteDatabase.executeUpdate(
-            """
-            CREATE TABLE IF NOT EXISTS sessions (
-                id VARCHAR(255) PRIMARY KEY,
-                user_id INT NOT NULL,
-                expires_at INTEGER NOT NULL, -- Unix Time (number of seconds since 1970-01-01)
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            )
-            """.trimIndent()
-        )
     }
 }

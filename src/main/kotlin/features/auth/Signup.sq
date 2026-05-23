@@ -1,0 +1,8 @@
+insertUser:
+INSERT INTO users (email, username, password_hash, apartment_id)
+VALUES (:email, :username, :password, NULL)
+RETURNING id;
+
+createSession:
+INSERT INTO sessions (id, user_id, expires_at)
+VALUES (:id, :userId, :expiresAt);
