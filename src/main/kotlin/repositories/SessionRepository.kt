@@ -1,6 +1,6 @@
+/*
 package dev.jakobdario.repositories
 
-import dev.jakobdario.SqliteDatabase
 import java.util.Date
 import java.util.UUID
 
@@ -55,4 +55,4 @@ class SessionRepositorySqlite(val tokenExpiration: Long = 60 * 60 * 24 * 30L) : 
         }
     }
 
-}
+}*/

@@ -1,8 +1,7 @@
 /*
-package dev.jakobdario.profile
+package dev.jakobdario.api
 
-import dev.jakobdario.entities.UserEntity
-import dev.jakobdario.getSession
+import dev.jakobdario.domain.entities.UserEntity
 import dev.jakobdario.repositories.UserRepository
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate

@@ -1,9 +1,6 @@
+/*
 package dev.jakobdario.repositories
 
-import dev.jakobdario.SqliteDatabase
-import dev.jakobdario.auth.Hash
-import dev.jakobdario.entities.ApartmentEntity
-import dev.jakobdario.entities.UserEntity
 import java.sql.ResultSet
 
 interface ApartmentRepository {
@@ -102,4 +99,4 @@ class ApartmentRepositorySqlite() : ApartmentRepository {
             setInt(1, userId)
         }
     }
-}
+}*/

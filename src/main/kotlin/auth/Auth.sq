@@ -1,0 +1,3 @@
+getUserId:
+SELECT user_id FROM sessions
+WHERE id = :sessionId AND expires_at > :currentTime;

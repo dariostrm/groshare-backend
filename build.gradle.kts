@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "2.3.0"
     kotlin("plugin.serialization") version "2.3.0"
     id("io.ktor.plugin") version "3.4.2"
+    id("app.cash.sqldelight") version "2.3.2"
 }
 
 group = "dev.jakobdario"
@@ -18,13 +19,24 @@ kotlin {
     jvmToolchain(21)
 }
 
+sqldelight {
+    databases {
+        register("Database") {
+            packageName.set("dev.jakobdario.database")
+            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.3.2")
+            srcDirs.setFrom("src/main/kotlin")
+        }
+    }
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-config-yaml")
-    implementation("org.xerial:sqlite-jdbc:3.51.3.0")
+    implementation("io.ktor:ktor-server-status-pages")
+    implementation("app.cash.sqldelight:sqlite-driver:2.3.2")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
     implementation("io.ktor:ktor-server-auth")

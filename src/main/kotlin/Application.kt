@@ -1,33 +1,53 @@
-package dev.jakobdario
-
-import dev.jakobdario.repositories.SessionRepository
-import dev.jakobdario.repositories.SessionRepositorySqlite
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import auth.configureAuth
+import dev.jakobdario.database.Database
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
+import io.ktor.server.netty.EngineMain
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.CORS
-import kotlinx.coroutines.runBlocking
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.ContentTransformationException
+import io.ktor.server.response.respond
+import shared.UnauthorizedException
+import shared.ValidationException
 import java.util.*
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {
-    val sessionRepo = SessionRepositorySqlite()
-
+    val database = configureDatabase()
     configureCors()
-    configureDatabase()
+    configureErrorHandling()
     configureSerialization()
-    configureAuth(sessionRepo)
-    configureRouting(sessionRepo)
+    configureAuth(database)
+    configureRouting()
+
+}
+
+fun Application.configureDatabase(): Database {
+    val dbUrl = System.getenv("JDBC_DATABASE_URL") ?: "jdbc:sqlite:groshare_backend.db"
+    val driver: SqlDriver = JdbcSqliteDriver(
+        url = dbUrl,
+        properties = Properties().apply {
+            put("foreign_keys", "true")
+            put("journal_mode", "WAL")
+            put("busy_timeout", "5000")
+        },
+        schema = Database.Schema,
+        migrateEmptySchema = true
+    )
     monitor.subscribe(ApplicationStopped) {
         println("Closing database...")
-        SqliteDatabase.close()
+        driver.close()
     }
+    return Database(driver)
 }
 
 fun Application.configureSerialization() {
@@ -56,77 +76,23 @@ fun Application.configureCors() {
 }
 
 data class UserSessionPrincipal(
-    val userId: Int,
+    val userId: Long,
     val sessionId: UUID
 )
-fun Application.configureAuth(sessionRepository: SessionRepository) {
-    install(Authentication) {
-        bearer {
-            realm = "GroShare"
-            authenticate { tokenCredential ->
-                val sessionId = try {
-                    UUID.fromString(tokenCredential.token)
-                } catch (e: IllegalArgumentException) {
-                    return@authenticate null
-                }
-                val userId = sessionRepository.getUserId(sessionId)
-                if (userId != null)
-                    UserSessionPrincipal(userId, sessionId)
-                else null
+
+fun Application.configureErrorHandling() {
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            when (cause) {
+                is ValidationException -> call.respond(HttpStatusCode.BadRequest,
+                    mapOf("error" to cause.message))
+                is UnauthorizedException -> call.respond(HttpStatusCode.Unauthorized,
+                    mapOf("error" to cause.message))
+                is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest,
+                    mapOf("error" to "Invalid request body format"))
+
+                else -> call.respond(HttpStatusCode.InternalServerError, mapOf("error" to cause.message))
             }
         }
-    }
-}
-
-fun configureDatabase() {
-    runBlocking {
-        SqliteDatabase.executeUpdate("PRAGMA foreign_keys = ON;")
-
-        SqliteDatabase.executeUpdate(
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email VARCHAR(255) NOT NULL UNIQUE,
-                username TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
-                apartment_id INTEGER,
-                FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE SET NULL
-            )
-            """.trimIndent()
-        )
-        SqliteDatabase.executeUpdate(
-            """
-            CREATE TABLE IF NOT EXISTS sessions (
-                id VARCHAR(255) PRIMARY KEY,
-                user_id INT NOT NULL,
-                expires_at INTEGER NOT NULL, -- Unix Time (number of seconds since 1970-01-01)
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            )
-            """.trimIndent()
-        )
-        SqliteDatabase.executeUpdate(
-            """
-            CREATE TABLE IF NOT EXISTS apartments (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                address TEXT NOT NULL,
-                city TEXT NOT NULL
-            )
-            """.trimIndent()
-        )
-        SqliteDatabase.executeUpdate(
-            """
-            CREATE TABLE IF NOT EXISTS invites (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                apartment_id INTEGER NOT NULL,
-                inviter_id INTEGER NOT NULL,
-                invited_user_id INTEGER NOT NULL,
-                status TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'rejected')),
-                FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
-                FOREIGN KEY (inviter_id) REFERENCES users(id) ON DELETE CASCADE,
-                FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE
-            )
-            """.trimIndent()
-        )
     }
 }

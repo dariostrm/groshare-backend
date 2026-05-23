@@ -1,7 +1,7 @@
+/*
 package dev.jakobdario.repositories
 
-import dev.jakobdario.SqliteDatabase
-import dev.jakobdario.auth.Hash
+import dev.jakobdario.auth.PasswordHash
 import dev.jakobdario.entities.UserEntity
 import java.sql.ResultSet
 
@@ -9,12 +9,12 @@ interface UserRepository {
     suspend fun getUsers(): List<UserEntity>
     suspend fun getUserById(id: Int): UserEntity?
     suspend fun getUserByUsername(username: String): UserEntity?
-    suspend fun updateUser(user: UserEntity)
+    suspend fun updateUser(user: dev.jakobdario.domain.entities.UserEntity)
     suspend fun deleteUser(id: Int)
     suspend fun checkUniqueUsername(username: String): Boolean
     suspend fun checkUniqueEmail(email: String): Boolean
-    suspend fun checkPassword(userId: Int, check: (Hash) -> Boolean): Boolean
-    suspend fun signUp(username: String, email: String, hashedPassword: Hash) : UserEntity
+    suspend fun checkPassword(userId: Int, check: (PasswordHash) -> Boolean): Boolean
+    suspend fun signUp(username: String, email: String, hashedPassword: PasswordHash) : UserEntity
 }
 
 fun ResultSet.toUser(): UserEntity {
@@ -50,7 +50,7 @@ class UserRepositorySqlite() : UserRepository {
         }.firstOrNull()
     }
 
-    override suspend fun updateUser(user: UserEntity) {
+    override suspend fun updateUser(user: dev.jakobdario.domain.entities.UserEntity) {
         SqliteDatabase.executeUpdate(
             "UPDATE users SET email = ?, username = ? WHERE id = ?"
         ) {
@@ -89,17 +89,17 @@ class UserRepositorySqlite() : UserRepository {
         }.isEmpty()
     }
 
-    override suspend fun checkPassword(userId: Int, check: (Hash) -> Boolean): Boolean {
+    override suspend fun checkPassword(userId: Int, check: (PasswordHash) -> Boolean): Boolean {
         val passwordHash = SqliteDatabase.executeQuery(
             "SELECT password_hash FROM users WHERE id = ?",
             map = { getString("password_hash") }
         ) {
             setInt(1, userId)
         }.firstOrNull() ?: return false
-        return check(Hash(passwordHash))
+        return check(PasswordHash(passwordHash))
     }
 
-    override suspend fun signUp(username: String, email: String, hashedPassword: Hash) : UserEntity {
+    override suspend fun signUp(username: String, email: String, hashedPassword: PasswordHash) : UserEntity {
         SqliteDatabase.executeUpdate(
             "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)"
         ) {
@@ -109,4 +109,4 @@ class UserRepositorySqlite() : UserRepository {
         }
         return getUserByUsername(username) ?: throw IllegalStateException("User was not created")
     }
-}
+}*/
