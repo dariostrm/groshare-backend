@@ -35,101 +35,94 @@ paths:
           content:
             '*/*':
               schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Invalid request body"
+                $ref: "#/components/schemas/ErrorResponse"
         "401":
           description: "Unauthorized"
           content:
             '*/*':
               schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Invalid credentials"
-                Example#2:
-                  value: "Invalid credentials"
-        "200":
-          description: "OK"
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal Server Error"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AuthResponse"
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
   /api/v1/logout:
     post:
       description: ""
       security:
-        - BearerAuth: []
+        - bearerAuth: []
       responses:
-        "401":
-          description: "Unauthorized"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Unauthorized"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Logged out successfully"
+        "204":
+          description: "No Content"
   /api/v1/profile:
     get:
       description: ""
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: []
       responses:
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "The user was not found"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Profile"
-    put:
-      description: "Updates the profile"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Profile"
-        required: true
-      security:
-        - BearerAuth: [ ]
-      responses:
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Your user was not found"
         "400":
           description: "Bad Request"
           content:
             '*/*':
               schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Invalid request body"
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProfileResponse"
+    put:
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditProfileRequest"
+        required: true
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "204":
+          description: "No Content"
         "409":
           description: "Conflict"
           content:
@@ -138,18 +131,15 @@ paths:
                 type: "string"
               examples:
                 Example#1:
-                  value: "Email is already taken"
-                Example#2:
-                  value: "Username is already taken"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Profile updated successfully"
+                  value: "Username or email already exists"
+  /api/v1/profile/apartment:
+    delete:
+      description: ""
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: "No Content"
   /api/v1/signup:
     post:
       description: ""
@@ -165,10 +155,25 @@ paths:
           content:
             '*/*':
               schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Invalid request body"
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignUpResponse"
         "409":
           description: "Conflict"
           content:
@@ -177,30 +182,17 @@ paths:
                 type: "string"
               examples:
                 Example#1:
-                  value: "Email is already taken"
-                Example#2:
-                  value: "Username is already taken"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AuthResponse"
-        "500":
-          description: "Internal Server Error"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "An error occurred while creating the user"
+                  value: "Username or email already exists"
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
   schemas:
+    ErrorResponse:
+      type: "object"
+      properties:
+        error:
+          type: "string"
+      required:
+        - "error"
+    # Other request/response schemas
     LoginRequest:
       type: "object"
       properties:
@@ -211,14 +203,27 @@ components:
       required:
         - "username"
         - "password"
-    AuthResponse:
+    LoginResponse:
       type: "object"
       properties:
         token:
           type: "string"
       required:
         - "token"
-    Profile:
+    GetProfileResponse:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        email:
+          type: "string"
+        apartmentName:
+          type: "string"
+          nullable: true
+      required:
+        - "username"
+        - "email"
+    EditProfileRequest:
       type: "object"
       properties:
         username:
@@ -241,3 +246,15 @@ components:
         - "username"
         - "email"
         - "password"
+    SignUpResponse:
+      type: "object"
+      properties:
+        token:
+          type: "string"
+      required:
+        - "token"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "UUID"

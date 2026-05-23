@@ -1,4 +1,4 @@
-package auth
+package features.auth
 
 import dev.jakobdario.database.Database
 import io.ktor.http.HttpStatusCode

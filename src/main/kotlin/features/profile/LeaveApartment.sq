@@ -1,0 +1,4 @@
+leaveApartment:
+UPDATE users
+SET apartment_id = NULL
+WHERE id = :userId;

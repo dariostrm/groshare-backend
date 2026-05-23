@@ -1,4 +1,4 @@
-package shared
+package shared.validation
 
 class ValidationException(message: String) : RuntimeException(message)
 

@@ -1,7 +1,5 @@
 package shared.validation
 
-import shared.ensure
-
 private val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
 private val USERNAME_REGEX = "^[a-zA-Z0-9._-]{3,30}$".toRegex()
 

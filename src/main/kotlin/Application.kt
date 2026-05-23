@@ -1,6 +1,9 @@
+package dev.jakobdario
+
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import auth.configureAuth
+import configureRouting
+import features.auth.configureAuth
 import dev.jakobdario.database.Database
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -13,8 +16,9 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.response.respond
+import kotlinx.serialization.Serializable
 import shared.UnauthorizedException
-import shared.ValidationException
+import shared.validation.ValidationException
 import java.util.*
 
 fun main(args: Array<String>) {
@@ -27,8 +31,7 @@ fun Application.module() {
     configureErrorHandling()
     configureSerialization()
     configureAuth(database)
-    configureRouting()
-
+    configureRouting(database)
 }
 
 fun Application.configureDatabase(): Database {
@@ -41,7 +44,6 @@ fun Application.configureDatabase(): Database {
             put("busy_timeout", "5000")
         },
         schema = Database.Schema,
-        migrateEmptySchema = true
     )
     monitor.subscribe(ApplicationStopped) {
         println("Closing database...")
@@ -75,21 +77,19 @@ fun Application.configureCors() {
     }
 }
 
-data class UserSessionPrincipal(
-    val userId: Long,
-    val sessionId: UUID
-)
+@Serializable
+data class ErrorResponse(val error: String)
 
 fun Application.configureErrorHandling() {
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             when (cause) {
                 is ValidationException -> call.respond(HttpStatusCode.BadRequest,
-                    mapOf("error" to cause.message))
+                    ErrorResponse(cause.message ?: "Validation error"))
                 is UnauthorizedException -> call.respond(HttpStatusCode.Unauthorized,
-                    mapOf("error" to cause.message))
+                    ErrorResponse(cause.message ?: "Unauthorized"))
                 is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest,
-                    mapOf("error" to "Invalid request body format"))
+                    ErrorResponse("Invalid request format: ${cause.message}"))
 
                 else -> call.respond(HttpStatusCode.InternalServerError, mapOf("error" to cause.message))
             }
