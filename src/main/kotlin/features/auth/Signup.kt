@@ -57,12 +57,10 @@ fun Route.signup(database: Database) {
 
         } catch (e: SQLException) {
             // SQLite error code 19 is SQLITE_CONSTRAINT
-            if (e.errorCode == 19) {
+            if (e.errorCode == 19)
                 call.respond(HttpStatusCode.Conflict, "Username or email already exists")
-            } else {
-                e.printStackTrace()
-                call.respond(HttpStatusCode.InternalServerError, "Database error occurred")
-            }
+            else
+                throw e
         }
     }
 }

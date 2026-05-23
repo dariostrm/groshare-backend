@@ -1,3 +1,5 @@
+package dev.jakobdario
+
 import features.auth.authRoutes
 import dev.jakobdario.database.Database
 import io.ktor.server.application.*

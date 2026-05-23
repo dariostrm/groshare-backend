@@ -2,7 +2,6 @@ package dev.jakobdario
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
-import configureRouting
 import features.auth.configureAuth
 import dev.jakobdario.database.Database
 import io.ktor.http.HttpHeaders
@@ -16,7 +15,9 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.response.respond
+import io.ktor.utils.io.CancellationException
 import kotlinx.serialization.Serializable
+import shared.ErrorResponse
 import shared.UnauthorizedException
 import shared.validation.ValidationException
 import java.util.*
@@ -77,13 +78,12 @@ fun Application.configureCors() {
     }
 }
 
-@Serializable
-data class ErrorResponse(val error: String)
-
 fun Application.configureErrorHandling() {
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             when (cause) {
+                is CancellationException -> throw cause // Don't handle cancellations, they are used for timeouts and such
+
                 is ValidationException -> call.respond(HttpStatusCode.BadRequest,
                     ErrorResponse(cause.message ?: "Validation error"))
                 is UnauthorizedException -> call.respond(HttpStatusCode.Unauthorized,
@@ -91,7 +91,11 @@ fun Application.configureErrorHandling() {
                 is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest,
                     ErrorResponse("Invalid request format: ${cause.message}"))
 
-                else -> call.respond(HttpStatusCode.InternalServerError, mapOf("error" to cause.message))
+                else -> {
+                    call.application.environment.log.error("Unexpected error occurred", cause)
+                    call.respond(HttpStatusCode.InternalServerError,
+                        ErrorResponse("An unexpected error occurred: ${cause.message}"))
+                }
             }
         }
     }
