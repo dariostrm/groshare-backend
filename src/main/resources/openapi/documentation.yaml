@@ -116,6 +116,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetApartmentResponse"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApartmentRequest"
+        required: true
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateApartmentResponse"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -228,3 +249,23 @@ components:
         - "address"
         - "city"
         - "roommatesCount"
+    CreateApartmentRequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        address:
+          type: "string"
+        city:
+          type: "string"
+      required:
+        - "name"
+        - "address"
+        - "city"
+    CreateApartmentResponse:
+      type: "object"
+      properties:
+        apartmentId:
+          type: "number"
+      required:
+        - "apartmentId"

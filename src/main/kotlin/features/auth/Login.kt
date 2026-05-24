@@ -1,6 +1,7 @@
 package features.auth
 
 import dev.jakobdario.database.Database
+import dev.jakobdario.shared.UnauthorizedException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -8,7 +9,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
 import shared.SecurityConfig.SESSION_EXPIRATION_SECONDS
-import shared.UnauthorizedException
 import shared.validation.ensureValidPassword
 import shared.validation.ensureValidUsername
 import java.util.UUID

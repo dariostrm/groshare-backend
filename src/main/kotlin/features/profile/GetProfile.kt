@@ -5,7 +5,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
-import shared.UnauthorizedException
+import dev.jakobdario.shared.exceptions.UnauthorizedException
 import shared.UserSessionPrincipal
 
 @Serializable

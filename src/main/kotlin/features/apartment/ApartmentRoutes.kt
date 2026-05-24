@@ -5,4 +5,5 @@ import io.ktor.server.routing.Route
 
 fun Route.apartmentRoutes(database: Database) {
     getApartment(database)
+    createApartment(database)
 }
