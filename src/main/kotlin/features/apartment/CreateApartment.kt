@@ -19,13 +19,19 @@ data class CreateApartmentRequest(
     val address: String,
     val city: String,
 ) {
-    fun ensureValid() {
-        ensure(name.isNotBlank()) { "Name must not be blank" }
-        ensure(name.length in 2..50) { "Name must be between 2 and 50 characters long" }
-        ensure(address.isNotBlank()) { "Address must not be blank" }
-        ensure(address.length in 5..100) { "Address must be between 5 and 100 characters long" }
-        ensure(city.isNotBlank()) { "City must not be blank" }
-        ensure(city.length in 2..50) { "City must be between 2 and 50 characters long" }
+    fun sanitizeAndEnsureValid(): CreateApartmentRequest {
+        val copy = copy(
+            name = name.trim(),
+            address = address.trim(),
+            city = city.trim(),
+        )
+        ensure(copy.name.isNotBlank()) { "Name must not be blank" }
+        ensure(copy.name.length in 2..50) { "Name must be between 2 and 50 characters long" }
+        ensure(copy.address.isNotBlank()) { "Address must not be blank" }
+        ensure(copy.address.length in 5..100) { "Address must be between 5 and 100 characters long" }
+        ensure(copy.city.isNotBlank()) { "City must not be blank" }
+        ensure(copy.city.length in 2..50) { "City must be between 2 and 50 characters long" }
+        return copy
     }
 }
 
@@ -39,7 +45,7 @@ fun Route.createApartment(database: Database) {
         post("/apartment") {
             val session = call.principal<UserSessionPrincipal>()!!
             val request = call.receive<CreateApartmentRequest>()
-            request.ensureValid()
+            val (name, address, city) = request.sanitizeAndEnsureValid()
 
             val apartmentId = db.transactionWithResult {
                 db.getApartmentId(session.userId).executeAsOneOrNull()?.let {
@@ -47,9 +53,9 @@ fun Route.createApartment(database: Database) {
                 }
 
                 val apartmentId = db.createApartment(
-                    name = request.name,
-                    address = request.address,
-                    city = request.city,
+                    name = name,
+                    address = address,
+                    city = city,
                 ).executeAsOne()
 
                 db.joinApartment(

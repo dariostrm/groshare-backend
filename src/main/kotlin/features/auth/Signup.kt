@@ -19,10 +19,16 @@ import kotlin.time.Clock
 
 @Serializable
 data class SignUpRequest(val username: String, val email: String, val password: String) {
-    fun ensureValid() {
-        username.ensureValidUsername()
-        email.ensureValidEmail()
-        password.ensureValidPassword()
+    fun sanitizeAndEnsureValid(): SignUpRequest {
+        val copy = copy(
+            username = username.trim(),
+            email = email.trim(),
+            password = password.trim()
+        )
+        copy.username.ensureValidUsername()
+        copy.email.ensureValidEmail()
+        copy.password.ensureValidPassword()
+        return copy
     }
 }
 @Serializable
@@ -33,17 +39,17 @@ fun Route.signup(database: Database) {
 
     post("/signup") {
         val request = call.receive<SignUpRequest>()
-        request.ensureValid()
+        val (username, email, password) = request.sanitizeAndEnsureValid()
 
-        val hashedPassword = PasswordManager.hashPassword(request.password)
+        val hashedPassword = PasswordManager.hashPassword(password)
         val sessionId = UUID.randomUUID()
         val expiresAt = Clock.System.now().epochSeconds + SESSION_EXPIRATION_SECONDS
 
         try {
             db.transaction {
                 val userId = db.insertUser(
-                    email = request.email,
-                    username = request.username,
+                    email = email,
+                    username = username,
                     password = hashedPassword.value,
                 ).executeAsOne()
 

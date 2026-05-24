@@ -16,9 +16,14 @@ import kotlin.time.Clock
 
 @Serializable
 data class LoginRequest(val username: String, val password: String) {
-    fun ensureValid() {
-        username.ensureValidUsername()
-        password.ensureValidPassword()
+    fun sanitizeAndEnsureValid(): LoginRequest {
+        val copy = copy(
+            username = username.trim(),
+            password = password.trim(),
+        )
+        copy.username.ensureValidUsername()
+        copy.password.ensureValidPassword()
+        return copy
     }
 }
 
@@ -30,13 +35,13 @@ fun Route.login(database: Database) {
 
     post("/login") {
         val request = call.receive<LoginRequest>()
-        request.ensureValid()
+        val (username, password) = request.sanitizeAndEnsureValid()
 
         val sessionId = UUID.randomUUID()
         database.transaction {
-            val (passwordHash, userId) = db.getPasswordHashAndIdByUsername(request.username).executeAsOneOrNull()
+            val (passwordHash, userId) = db.getPasswordHashAndIdByUsername(username).executeAsOneOrNull()
                 ?: throw UnauthorizedException()
-            val validPw = PasswordManager.verify(request.password, PasswordHash(passwordHash))
+            val validPw = PasswordManager.verify(password, PasswordHash(passwordHash))
             if (!validPw)
                 throw UnauthorizedException()
 
