@@ -3,3 +3,8 @@ SELECT apartments.id, apartments.name, apartments.address, apartments.city, COUN
 FROM apartments JOIN users
 ON apartments.id = users.apartment_id
 WHERE users.id = :userId;
+
+getRoomatesByApartmentId:
+SELECT users.id, users.username
+FROM users
+WHERE users.apartment_id = :apartmentId;

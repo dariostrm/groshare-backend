@@ -234,21 +234,35 @@ components:
       type: "object"
       properties:
         apartmentId:
-          type: "number"
+          type: "integer"
+          format: "int64"
         name:
           type: "string"
         address:
           type: "string"
         city:
           type: "string"
-        roommatesCount:
-          type: "number"
+        roommates:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Roommate"
       required:
         - "apartmentId"
         - "name"
         - "address"
         - "city"
-        - "roommatesCount"
+        - "roommates"
+    Roommate:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        username:
+          type: "string"
+      required:
+        - "id"
+        - "username"
     CreateApartmentRequest:
       type: "object"
       properties:

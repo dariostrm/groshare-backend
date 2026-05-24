@@ -8,6 +8,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import kotlinx.serialization.Serializable
+import shared.ErrorResponse
 import shared.UserSessionPrincipal
 
 @Serializable
@@ -16,31 +17,35 @@ data class GetApartmentResponse(
     val name: String,
     val address: String,
     val city: String,
-    val roommatesCount: Long,
+    val roommates: List<Roommate>,
+)
+
+@Serializable
+data class Roommate(
+    val id: Long,
+    val username: String
 )
 
 fun Route.getApartment(database: Database) {
+    val db = database.getApartmentQueries
+
     authenticate {
         get("/apartment") {
             val session = call.principal<UserSessionPrincipal>()!!
 
-            val response = database.getApartmentQueries.getApartmentByUserId(
-                userId = session.userId,
-                mapper = { apartmentId, name, address, city, roommatesCount ->
-                    GetApartmentResponse(
-                        apartmentId = apartmentId,
-                        name = name,
-                        address = address,
-                        city = city,
-                        roommatesCount = roommatesCount
-                    )
-                }
-            ).executeAsOneOrNull()
+            val apartment = db.getApartmentByUserId(session.userId).executeAsOneOrNull()
+                ?: return@get call.respond(HttpStatusCode.NotFound)
 
-            if (response != null)
-                call.respond(HttpStatusCode.OK, response)
-            else
-                call.respond(HttpStatusCode.NotFound)
+            val roommates = db.getRoomatesByApartmentId(apartment.id).executeAsList()
+                .map { Roommate(id = it.id, username = it.username) }
+
+            call.respond(HttpStatusCode.OK, GetApartmentResponse(
+                apartmentId = apartment.id,
+                name = apartment.name,
+                address = apartment.address,
+                city = apartment.city,
+                roommates = roommates
+            ))
         }
     }
 }
