@@ -2,7 +2,7 @@ package dev.jakobdario
 
 import features.auth.authRoutes
 import dev.jakobdario.database.Database
-import dev.jakobdario.features.apartment.apartmentRoutes
+import features.apartment.apartmentRoutes
 import io.ktor.server.application.*
 import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*

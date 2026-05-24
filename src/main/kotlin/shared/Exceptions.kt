@@ -1,4 +1,4 @@
-package dev.jakobdario.shared
+package shared
 
 class UnauthorizedException(message: String = "Invalid credentials") : RuntimeException(message)
 class ConflictException(message: String = "Conflict") : RuntimeException(message)

@@ -4,10 +4,10 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import features.auth.configureAuth
 import dev.jakobdario.database.Database
-import dev.jakobdario.shared.ConflictException
-import dev.jakobdario.shared.ForbiddenException
-import dev.jakobdario.shared.NotFoundException
-import dev.jakobdario.shared.UnauthorizedException
+import shared.ConflictException
+import shared.ForbiddenException
+import shared.NotFoundException
+import shared.UnauthorizedException
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode

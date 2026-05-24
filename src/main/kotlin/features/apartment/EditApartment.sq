@@ -1,0 +1,4 @@
+updateApartment:
+UPDATE apartments
+SET name = :name, address = :address, city = :city
+WHERE id = (SELECT apartment_id FROM users WHERE id = :userId);

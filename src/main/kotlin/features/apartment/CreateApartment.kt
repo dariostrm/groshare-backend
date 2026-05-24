@@ -1,7 +1,7 @@
-package dev.jakobdario.features.apartment
+package features.apartment
 
 import dev.jakobdario.database.Database
-import dev.jakobdario.shared.ConflictException
+import shared.ConflictException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
@@ -12,6 +12,9 @@ import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
 import shared.UserSessionPrincipal
 import shared.validation.ensure
+import shared.validation.ensureValidAddress
+import shared.validation.ensureValidApartmentName
+import shared.validation.ensureValidCity
 
 @Serializable
 data class CreateApartmentRequest(
@@ -25,12 +28,9 @@ data class CreateApartmentRequest(
             address = address.trim(),
             city = city.trim(),
         )
-        ensure(copy.name.isNotBlank()) { "Name must not be blank" }
-        ensure(copy.name.length in 2..50) { "Name must be between 2 and 50 characters long" }
-        ensure(copy.address.isNotBlank()) { "Address must not be blank" }
-        ensure(copy.address.length in 5..100) { "Address must be between 5 and 100 characters long" }
-        ensure(copy.city.isNotBlank()) { "City must not be blank" }
-        ensure(copy.city.length in 2..50) { "City must be between 2 and 50 characters long" }
+        copy.name.ensureValidApartmentName()
+        copy.address.ensureValidAddress()
+        copy.city.ensureValidCity()
         return copy
     }
 }

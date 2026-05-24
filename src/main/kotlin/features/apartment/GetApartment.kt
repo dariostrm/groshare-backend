@@ -1,4 +1,4 @@
-package dev.jakobdario.features.apartment
+package features.apartment
 
 import dev.jakobdario.database.Database
 import io.ktor.http.HttpStatusCode
@@ -8,7 +8,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import kotlinx.serialization.Serializable
-import shared.ErrorResponse
 import shared.UserSessionPrincipal
 
 @Serializable
@@ -36,7 +35,7 @@ fun Route.getApartment(database: Database) {
             val apartment = db.getApartmentByUserId(session.userId).executeAsOneOrNull()
                 ?: return@get call.respond(HttpStatusCode.NotFound)
 
-            val roommates = db.getRoomatesByApartmentId(apartment.id).executeAsList()
+            val roommates = db.getRoommatesByApartmentId(apartment.id).executeAsList()
                 .map { Roommate(id = it.id, username = it.username) }
 
             call.respond(HttpStatusCode.OK, GetApartmentResponse(

@@ -1,7 +1,7 @@
 package features.auth
 
 import dev.jakobdario.database.Database
-import dev.jakobdario.shared.UnauthorizedException
+import shared.UnauthorizedException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
