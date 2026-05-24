@@ -2,3 +2,7 @@ leaveApartment:
 UPDATE users
 SET apartment_id = NULL
 WHERE id = :userId;
+
+deleteEmptyApartments:
+DELETE FROM apartments
+WHERE id NOT IN (SELECT DISTINCT apartment_id FROM users WHERE apartment_id IS NOT NULL);

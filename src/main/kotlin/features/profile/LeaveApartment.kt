@@ -13,6 +13,7 @@ fun Route.leaveApartment(database: Database) {
             val session = call.principal<UserSessionPrincipal>()!!
 
             database.leaveApartmentQueries.leaveApartment(session.userId)
+            database.leaveApartmentQueries.deleteEmptyApartments()
             call.respond(HttpStatusCode.NoContent)
         }
     }
