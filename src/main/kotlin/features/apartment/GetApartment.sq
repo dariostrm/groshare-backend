@@ -1,0 +1,10 @@
+getApartmentByUserId:
+SELECT apartments.id, apartments.name, apartments.address, apartments.city
+FROM apartments JOIN users
+ON apartments.id = users.apartment_id
+WHERE users.id = :userId;
+
+getRoommatesByApartmentId:
+SELECT users.id, users.username
+FROM users
+WHERE users.apartment_id = :apartmentId;

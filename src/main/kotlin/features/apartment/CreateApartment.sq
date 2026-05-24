@@ -1,0 +1,14 @@
+createApartment:
+INSERT INTO apartments (name, address, city)
+VALUES (:name, :address, :city)
+RETURNING id;
+
+joinApartment:
+UPDATE users
+SET apartment_id = :apartmentId
+WHERE id = :userId;
+
+getApartmentId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;

@@ -4,6 +4,10 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import features.auth.configureAuth
 import dev.jakobdario.database.Database
+import shared.ConflictException
+import shared.ForbiddenException
+import shared.NotFoundException
+import shared.UnauthorizedException
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -16,9 +20,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.response.respond
 import io.ktor.utils.io.CancellationException
-import kotlinx.serialization.Serializable
 import shared.ErrorResponse
-import shared.UnauthorizedException
 import shared.validation.ValidationException
 import java.util.*
 
@@ -80,6 +82,10 @@ fun Application.configureCors() {
 
 fun Application.configureErrorHandling() {
     install(StatusPages) {
+        status(HttpStatusCode.Unauthorized) { call, _ ->
+            call.respond(HttpStatusCode.Unauthorized,
+                ErrorResponse("You need to be logged in to access this resource."))
+        }
         exception<Throwable> { call, cause ->
             when (cause) {
                 is CancellationException -> throw cause // Don't handle cancellations, they are used for timeouts and such
@@ -88,6 +94,12 @@ fun Application.configureErrorHandling() {
                     ErrorResponse(cause.message ?: "Validation error"))
                 is UnauthorizedException -> call.respond(HttpStatusCode.Unauthorized,
                     ErrorResponse(cause.message ?: "Unauthorized"))
+                is ForbiddenException -> call.respond(HttpStatusCode.Forbidden,
+                    ErrorResponse(cause.message ?: "Forbidden"))
+                is NotFoundException -> call.respond(HttpStatusCode.NotFound,
+                    ErrorResponse(cause.message ?: "Not Found"))
+                is ConflictException -> call.respond(HttpStatusCode.Conflict,
+                    ErrorResponse(cause.message ?: "Conflict"))
                 is ContentTransformationException -> call.respond(HttpStatusCode.BadRequest,
                     ErrorResponse("Invalid request format: ${cause.message}"))
 

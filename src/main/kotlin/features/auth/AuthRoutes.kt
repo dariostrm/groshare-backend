@@ -27,6 +27,7 @@ fun Application.configureAuth(database: Database) {
                     UserSessionPrincipal(userId, sessionId)
                 else null
             }
+            
         }
     }
 }

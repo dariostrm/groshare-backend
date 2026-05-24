@@ -1,11 +1,11 @@
 package features.profile
 
 import dev.jakobdario.database.Database
+import shared.UnauthorizedException
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
-import shared.UnauthorizedException
 import shared.UserSessionPrincipal
 
 @Serializable
