@@ -9,6 +9,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.put
 import kotlinx.serialization.Serializable
+import shared.ErrorResponse
 import shared.UserSessionPrincipal
 import shared.validation.ensureValidEmail
 import shared.validation.ensureValidUsername
@@ -43,7 +44,8 @@ fun Route.editProfile(database: Database) {
             } catch (e: SQLException) {
                 // SQLite error code 19 is SQLITE_CONSTRAINT
                 if (e.errorCode == 19)
-                    call.respond(HttpStatusCode.Conflict, "Username or email already exists")
+                    call.respond(HttpStatusCode.Conflict,
+                        ErrorResponse("Username or email already exists"))
                 else
                     throw e
             }

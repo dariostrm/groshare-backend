@@ -7,6 +7,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
+import shared.ErrorResponse
 import shared.SecurityConfig.SESSION_EXPIRATION_SECONDS
 import shared.validation.ensureValidEmail
 import shared.validation.ensureValidPassword
@@ -58,7 +59,8 @@ fun Route.signup(database: Database) {
         } catch (e: SQLException) {
             // SQLite error code 19 is SQLITE_CONSTRAINT
             if (e.errorCode == 19)
-                call.respond(HttpStatusCode.Conflict, "Username or email already exists")
+                call.respond(HttpStatusCode.Conflict,
+                    ErrorResponse("Username or email already exists"))
             else
                 throw e
         }

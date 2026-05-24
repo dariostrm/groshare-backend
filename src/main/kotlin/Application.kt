@@ -80,6 +80,10 @@ fun Application.configureCors() {
 
 fun Application.configureErrorHandling() {
     install(StatusPages) {
+        status(HttpStatusCode.Unauthorized) { call, _ ->
+            call.respond(HttpStatusCode.Unauthorized,
+                ErrorResponse("You need to be logged in to access this resource."))
+        }
         exception<Throwable> { call, cause ->
             when (cause) {
                 is CancellationException -> throw cause // Don't handle cancellations, they are used for timeouts and such

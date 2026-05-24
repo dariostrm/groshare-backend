@@ -1,0 +1,5 @@
+getApartmentByUserId:
+SELECT apartments.id, apartments.name, apartments.address, apartments.city, COUNT(users.id) AS roommates_count
+FROM apartments JOIN users
+ON apartments.id = users.apartment_id
+WHERE users.id = :userId;
