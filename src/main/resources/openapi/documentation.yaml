@@ -150,6 +150,25 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "204":
           description: "No Content"
+  /api/v1/apartment/invites:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendInviteRequest"
+        required: true
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "204":
+          description: "No Content"
 
 components:
   securitySchemes:
@@ -176,6 +195,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     ErrorResponse:
       type: "object"
@@ -184,6 +215,13 @@ components:
           type: "string"
       required:
         - "error"
+    SendInviteRequest:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+      required:
+        - "username"
     LoginRequest:
       type: "object"
       properties:
