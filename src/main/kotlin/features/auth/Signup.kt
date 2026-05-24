@@ -23,7 +23,7 @@ data class SignUpRequest(val username: String, val email: String, val password: 
         val copy = copy(
             username = username.trim(),
             email = email.trim(),
-            password = password.trim()
+            password = password
         )
         copy.username.ensureValidUsername()
         copy.email.ensureValidEmail()

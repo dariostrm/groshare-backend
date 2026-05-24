@@ -3,7 +3,7 @@ package shared.validation
 private val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
 private val USERNAME_REGEX = "^[a-zA-Z0-9._-]{3,30}$".toRegex()
 
-fun String.ensureValidPassword() = ensure(length >= 8) { "Password must be at least 8 characters long" }
+fun String.ensureValidPassword() = ensure(length in 8..64) { "Password must be between 8 and 64 characters long" }
 
 fun String.ensureValidEmail() = ensure(matches(EMAIL_REGEX)) { "Invalid email format" }
 

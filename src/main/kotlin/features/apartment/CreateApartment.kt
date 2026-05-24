@@ -11,7 +11,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
 import shared.UserSessionPrincipal
-import shared.validation.ensure
 import shared.validation.ensureValidAddress
 import shared.validation.ensureValidApartmentName
 import shared.validation.ensureValidCity

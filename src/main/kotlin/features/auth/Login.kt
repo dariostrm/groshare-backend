@@ -19,7 +19,7 @@ data class LoginRequest(val username: String, val password: String) {
     fun sanitizeAndEnsureValid(): LoginRequest {
         val copy = copy(
             username = username.trim(),
-            password = password.trim(),
+            password = password,
         )
         copy.username.ensureValidUsername()
         copy.password.ensureValidPassword()

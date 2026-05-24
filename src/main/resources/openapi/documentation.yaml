@@ -7,11 +7,11 @@ servers:
   - url: "https://groshare.dariostrm.dev"
   - url: "http://localhost:8080"
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 paths:
   /api/v1:
     get:
-      security: []
+      security: [ ]
       responses:
         "200":
           description: "OK"
@@ -24,7 +24,7 @@ paths:
                   value: "Hello World!"
   /api/v1/login:
     post:
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -85,7 +85,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
   /api/v1/signup:
     post:
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -138,18 +138,18 @@ paths:
                 $ref: "#/components/schemas/CreateApartmentResponse"
     put:
       requestBody:
-          content:
-            application/json:
-                schema:
-                  $ref: "#/components/schemas/EditApartmentRequest"
-          required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditApartmentRequest"
+        required: true
       responses:
-          "400":
-            $ref: "#/components/responses/BadRequest"
-          "401":
-            $ref: "#/components/responses/Unauthorized"
-          "204":
-            description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "204":
+          description: "No Content"
 
 components:
   securitySchemes:
