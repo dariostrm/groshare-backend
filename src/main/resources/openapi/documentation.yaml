@@ -169,6 +169,17 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "204":
           description: "No Content"
+  /api/v1/invites:
+    get:
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetInvitesResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
 components:
   securitySchemes:
@@ -215,6 +226,31 @@ components:
           type: "string"
       required:
         - "error"
+    GetInvitesResponse:
+      type: "object"
+      properties:
+        invites:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Invite"
+    Invite:
+      type: "object"
+      properties:
+        inviteId:
+          type: "integer"
+          format: "int64"
+        inviterName:
+          type: "string"
+        apartmentName:
+          type: "string"
+        sentAtInEpochSeconds:
+          type: "integer"
+          format: "int64"
+      required:
+        - "inviteId"
+        - "inviterName"
+        - "apartmentName"
+        - "sentAtInEpochSeconds"
     SendInviteRequest:
       type: "object"
       properties:
