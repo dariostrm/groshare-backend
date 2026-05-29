@@ -180,6 +180,24 @@ paths:
                 $ref: "#/components/schemas/GetInvitesResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
+  /api/v1/invites/{inviteId}/accept:
+    post:
+      parameters:
+        - name: inviteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
 
 components:
   securitySchemes:
