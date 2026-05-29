@@ -47,9 +47,9 @@ fun Route.createApartment(database: Database) {
             val (name, address, city) = request.sanitizeAndEnsureValid()
 
             val apartmentId = db.transactionWithResult {
-                db.getApartmentId(session.userId).executeAsOneOrNull()?.let {
+                val currentApartmentId = db.getApartmentId(session.userId).executeAsOneOrNull()
+                if (currentApartmentId != null)
                     throw ConflictException("User is already part of an apartment")
-                }
 
                 val apartmentId = db.createApartment(
                     name = name,
