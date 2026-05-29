@@ -10,6 +10,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
+import shared.UnauthorizedException
 import shared.UserSessionPrincipal
 import shared.validation.ensureValidAddress
 import shared.validation.ensureValidApartmentName
@@ -47,8 +48,9 @@ fun Route.createApartment(database: Database) {
             val (name, address, city) = request.sanitizeAndEnsureValid()
 
             val apartmentId = db.transactionWithResult {
-                val currentApartmentId = db.getApartmentId(session.userId).executeAsOneOrNull()
-                if (currentApartmentId != null)
+                val result = db.getApartmentId(session.userId).executeAsOneOrNull()
+                    ?: throw UnauthorizedException("Account no longer exists")
+                if (result.apartment_id != null)
                     throw ConflictException("User is already part of an apartment")
 
                 val apartmentId = db.createApartment(

@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import shared.ConflictException
 import shared.ForbiddenException
 import shared.NotFoundException
+import shared.UnauthorizedException
 import shared.UserSessionPrincipal
 import shared.validation.ValidationException
 import java.sql.SQLException
@@ -25,7 +26,8 @@ fun Route.acceptInvite(database: Database) {
                 db.transaction {
 
                     val currentApartment = db.getApartmentId(session.userId).executeAsOneOrNull()
-                    if (currentApartment != null)
+                        ?: throw UnauthorizedException("Account no longer exists")
+                    if (currentApartment.apartment_id != null)
                         throw ConflictException("Please leave your apartment before accepting an invite to another one")
 
                     val (apartmentId, invitedUserId) = db.getInvite(inviteId).executeAsOneOrNull()
