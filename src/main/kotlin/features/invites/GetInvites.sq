@@ -1,0 +1,6 @@
+getInvitesForUserId:
+SELECT invites.id, apartments.name, users.username, invites.created_at
+FROM invites
+JOIN users ON invites.inviter_id = users.id
+JOIN apartments ON invites.apartment_id = apartments.id
+WHERE invited_user_id = :userId;

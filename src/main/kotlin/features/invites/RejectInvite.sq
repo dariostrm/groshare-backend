@@ -1,0 +1,7 @@
+deleteInvite:
+DELETE FROM invites
+WHERE id = :inviteId;
+
+getInvitedUserId:
+SELECT invited_user_id FROM invites
+WHERE id = :inviteId;

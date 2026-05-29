@@ -8,12 +8,15 @@ import io.ktor.server.routing.*
 import shared.UserSessionPrincipal
 
 fun Route.leaveApartment(database: Database) {
+    val db = database.leaveApartmentQueries
     authenticate {
         delete("/profile/apartment") {
             val session = call.principal<UserSessionPrincipal>()!!
 
-            database.leaveApartmentQueries.leaveApartment(session.userId)
-            database.leaveApartmentQueries.deleteEmptyApartments()
+            db.transaction {
+                db.leaveApartment(session.userId)
+                db.deleteEmptyApartments()
+            }
             call.respond(HttpStatusCode.NoContent)
         }
     }

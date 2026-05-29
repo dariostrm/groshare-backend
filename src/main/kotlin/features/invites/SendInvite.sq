@@ -1,0 +1,11 @@
+getUserIdByUsername:
+SELECT id FROM users WHERE username = :username;
+
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;
+
+insertInvite:
+INSERT INTO invites (apartment_id, inviter_id, invited_user_id, created_at)
+VALUES (:apartmentId, :inviterId, :invitedUserId, :createdAt);

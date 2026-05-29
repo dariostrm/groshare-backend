@@ -3,6 +3,7 @@ package dev.jakobdario
 import features.auth.authRoutes
 import dev.jakobdario.database.Database
 import features.apartment.apartmentRoutes
+import features.invites.inviteRoutes
 import io.ktor.server.application.*
 import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*
@@ -22,6 +23,7 @@ fun Application.configureRouting(database: Database) {
             authRoutes(database)
             profileRoutes(database)
             apartmentRoutes(database)
+            inviteRoutes(database)
         }
     }
 }

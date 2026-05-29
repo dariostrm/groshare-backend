@@ -1,0 +1,17 @@
+addUserToApartment:
+UPDATE users
+SET apartment_id = :apartmentId
+WHERE id = :userId;
+
+deleteInvite:
+DELETE FROM invites
+WHERE id = :inviteId;
+
+getInvite:
+SELECT apartment_id, invited_user_id FROM invites
+WHERE id = :inviteId;
+
+getApartmentId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;

@@ -150,6 +150,80 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "204":
           description: "No Content"
+  /api/v1/apartment/invites:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendInviteRequest"
+        required: true
+      responses:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "204":
+          description: "No Content"
+  /api/v1/invites:
+    get:
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetInvitesResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/v1/invites/{inviteId}/accept:
+    post:
+      parameters:
+        - name: inviteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/invites/{inviteId}:
+    delete:
+      parameters:
+        - name: inviteId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   securitySchemes:
@@ -176,6 +250,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     ErrorResponse:
       type: "object"
@@ -184,6 +270,39 @@ components:
           type: "string"
       required:
         - "error"
+    GetInvitesResponse:
+      type: "object"
+      properties:
+        invites:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Invite"
+      required:
+        - "invites"
+      type: "object"
+      properties:
+        inviteId:
+          type: "integer"
+          format: "int64"
+        inviterName:
+          type: "string"
+        apartmentName:
+          type: "string"
+        sentAtInEpochSeconds:
+          type: "integer"
+          format: "int64"
+      required:
+        - "inviteId"
+        - "inviterName"
+        - "apartmentName"
+        - "sentAtInEpochSeconds"
+    SendInviteRequest:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+      required:
+        - "username"
     LoginRequest:
       type: "object"
       properties:
