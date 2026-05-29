@@ -279,6 +279,7 @@ components:
             $ref: "#/components/schemas/Invite"
       required:
         - "invites"
+    Invite:
       type: "object"
       properties:
         inviteId:
