@@ -1,4 +1,7 @@
 deleteInvite:
 DELETE FROM invites
-WHERE id = :inviteId
-RETURNING apartment_id;
+WHERE id = :inviteId;
+
+getInvitedUserId:
+SELECT invited_user_id FROM invites
+WHERE id = :inviteId;

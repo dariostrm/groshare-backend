@@ -1,4 +1,4 @@
-package dev.jakobdario.features.invites
+package features.invites
 
 import dev.jakobdario.database.Database
 import io.ktor.http.*

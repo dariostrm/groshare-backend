@@ -1,20 +1,14 @@
 package features.invites
 
 import dev.jakobdario.database.Database
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.principal
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.post
+import io.ktor.http.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
-import shared.ErrorResponse
-import shared.ForbiddenException
-import shared.NotFoundException
-import shared.UnauthorizedException
-import shared.UserSessionPrincipal
+import shared.*
+import shared.validation.ValidationException
 import shared.validation.ensureValidUsername
 import java.sql.SQLException
 import kotlin.time.Clock
@@ -50,7 +44,7 @@ fun Route.sendInvite(database: Database) {
                         ?: throw NotFoundException("User with username '$username' not found")
 
                     if (recipientId == session.userId)
-                        throw BadRequestException("You cannot invite yourself to your apartment")
+                        throw ValidationException("You cannot invite yourself to your apartment")
 
                     db.insertInvite(
                         apartmentId = apartmentId,
