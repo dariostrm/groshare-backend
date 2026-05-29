@@ -1,16 +1,12 @@
 package dev.jakobdario.features.invites
 
 import dev.jakobdario.database.Database
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.principal
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
+import io.ktor.http.*
+import io.ktor.server.auth.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import shared.UserSessionPrincipal
-import shared.db.Invites
 
 @Serializable
 data class Invite(

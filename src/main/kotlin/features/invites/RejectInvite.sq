@@ -1,0 +1,4 @@
+deleteInvite:
+DELETE FROM invites
+WHERE id = :inviteId
+RETURNING apartment_id;
