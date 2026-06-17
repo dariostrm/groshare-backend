@@ -1,0 +1,10 @@
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;
+
+getGroceriesFromApartment:
+SELECT g.id, g.name, creator.username AS addedByUsername
+FROM groceries g
+JOIN users creator ON g.creator_id = creator.id
+WHERE g.apartment_id = :apartmentId;

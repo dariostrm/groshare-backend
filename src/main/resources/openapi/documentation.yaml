@@ -150,6 +150,21 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "204":
           description: "No Content"
+  /api/v1/apartment/groceries:
+    get:
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Grocery"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/v1/apartment/invites:
     post:
       requestBody:
@@ -431,3 +446,17 @@ components:
         - "name"
         - "address"
         - "city"
+    Grocery:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        addedByUsername:
+          type: "string"
+      required:
+        - "id"
+        - "name"
+        - "addedByUsername"
