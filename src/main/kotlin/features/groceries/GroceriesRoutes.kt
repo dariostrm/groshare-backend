@@ -8,4 +8,6 @@ import io.ktor.server.routing.Route
 
 fun Route.groceriesRoutes(database: Database) {
     getGroceries(database)
+    addGrocery(database)
+    deleteGrocery(database)
 }
