@@ -3,13 +3,12 @@ package dev.jakobdario.features.groceries
 import dev.jakobdario.database.Database
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.*
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
-import shared.ForbiddenException
 import shared.UnauthorizedException
 import shared.UserSessionPrincipal
+import shared.NotFoundException
 
 @Serializable
 data class Grocery(
