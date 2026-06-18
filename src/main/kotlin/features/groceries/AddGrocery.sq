@@ -1,0 +1,9 @@
+insertGrocery:
+INSERT INTO groceries(name, apartment_id, creator_id)
+VALUES (:name, :apartmentId, :creatorId)
+RETURNING id;
+
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;

@@ -1,0 +1,13 @@
+deleteGrocery:
+DELETE FROM groceries
+WHERE id = :id;
+
+getGrocerysApartmentByID:
+SELECT apartment_id
+FROM groceries
+WHERE id = :id;
+
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;
