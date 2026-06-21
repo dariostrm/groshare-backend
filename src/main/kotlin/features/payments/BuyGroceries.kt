@@ -41,7 +41,7 @@ fun Route.buyGroceries(database: Database) {
                 val apartmentResult = db.getApartmentIdByUserId(session.userId).executeAsOneOrNull()
                     ?: throw UnauthorizedException("Account no longer exists")
                 val apartmentId = apartmentResult.apartment_id
-                    ?: throw NotFoundException("Cannot add a grocery because you are not in any apartment")
+                    ?: throw NotFoundException("You are not in any apartment")
 
                 val timeStamp = Clock.System.now().epochSeconds
                 val affectedGroceries = db.updateBoughtGroceries(

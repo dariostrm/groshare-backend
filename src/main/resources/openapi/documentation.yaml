@@ -150,6 +150,19 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "204":
           description: "No Content"
+  /api/v1/apartment/debts:
+    get:
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApartmentDebtsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/v1/apartment/groceries:
     get:
       responses:
@@ -555,3 +568,34 @@ components:
       required:
         - "id"
         - "priceInCents"
+    ApartmentDebtsResponse:
+      type: "object"
+      properties:
+        totalNetCents:
+          type: "integer"
+        debts:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Debt"
+      required:
+        - "totalNetCents"
+        - "debts"
+    Debt:
+      type: "object"
+      properties:
+        roommate:
+          $ref: "#/components/schemas/Roommate"
+        amountCents:
+          type: "integer"
+        relation:
+          $ref: "#/components/schemas/DebtRelation"
+      required:
+        - "roommate"
+        - "amountCents"
+        - "relation"
+    DebtRelation:
+      type: "string"
+      enum:
+        - "OWES_ME"
+        - "I_OWE"
+        - "FLAT"

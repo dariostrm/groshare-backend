@@ -1,0 +1,22 @@
+getRoommateBalances:
+SELECT
+    u.id AS roommate_id,
+    u.username AS roommate_username,
+    --for each user, the total I owe them
+    COALESCE(SUM(CASE WHEN p.paid_by_id = u.id AND p.owed_by_id = :myUserId THEN p.price_cents ELSE 0 END), 0) AS i_owe_them,
+    --and how much they owe me
+    COALESCE(SUM(CASE WHEN p.paid_by_id = :myUserId AND p.owed_by_id = u.id THEN p.price_cents ELSE 0 END), 0) AS they_owe_me
+FROM users u
+LEFT JOIN payments p ON (
+    --we only want payments between us and the user we're joining
+    (p.paid_by_id = u.id AND p.owed_by_id = :myUserId) OR
+    (p.paid_by_id = :myUserId AND p.owed_by_id = u.id)
+)
+WHERE u.apartment_id = :aptId
+  AND u.id != :myUserId
+GROUP BY u.id, u.username;
+
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;
