@@ -185,6 +185,25 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+  /api/v1/apartment/groceries/buy:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BuyGroceriesRequest"
+        required: true
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/v1/apartment/groceries/{groceryId}:
     delete:
       parameters:
@@ -515,3 +534,24 @@ components:
           format: "int64"
       required:
         - "id"
+    BuyGroceriesRequest:
+      type: "object"
+      properties:
+        purchases:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GroceryPurchase"
+      required:
+        - "purchases"
+    GroceryPurchase:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        priceInCents:
+          type: "integer"
+          format: "int64"
+      required:
+        - "id"
+        - "priceInCents"
