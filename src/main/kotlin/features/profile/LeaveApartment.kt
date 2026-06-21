@@ -14,6 +14,7 @@ fun Route.leaveApartment(database: Database) {
             val session = call.principal<UserSessionPrincipal>()!!
 
             db.transaction {
+                db.deleteGroceriesFromUser(session.userId)
                 db.leaveApartment(session.userId)
                 db.deleteEmptyApartments()
             }

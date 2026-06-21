@@ -6,3 +6,8 @@ WHERE id = :userId;
 deleteEmptyApartments:
 DELETE FROM apartments
 WHERE id NOT IN (SELECT DISTINCT apartment_id FROM users WHERE apartment_id IS NOT NULL);
+
+deleteGroceriesFromUser:
+DELETE FROM groceries
+WHERE creator_id = :userId
+AND bought_at IS NULL;

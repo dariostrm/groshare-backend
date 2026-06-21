@@ -1,0 +1,16 @@
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;
+
+updateBoughtGroceries:
+UPDATE groceries
+SET bought_at = :timeStamp
+WHERE apartment_id = :aptId AND bought_at IS NULL
+  AND id IN :ids
+RETURNING id, creator_id;
+
+insertPayment:
+INSERT INTO payments(paid_by_id, owed_by_id, price_cents, grocery_id, created_at, type)
+VALUES (:buyerId, :itemOwnerId, :priceInCents, :grocery, :timeStamp, 'grocery')
+RETURNING id;

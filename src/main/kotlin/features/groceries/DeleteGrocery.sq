@@ -1,11 +1,12 @@
 deleteGrocery:
 DELETE FROM groceries
-WHERE id = :id;
+WHERE id = :id
+AND bought_at IS NULL;
 
 getGrocerysApartmentByID:
 SELECT apartment_id
 FROM groceries
-WHERE id = :id;
+WHERE bought_at IS NULL AND id = :id;
 
 getApartmentIdByUserId:
 SELECT apartment_id

@@ -39,6 +39,19 @@ CREATE TABLE IF NOT EXISTS groceries (
     name TEXT NOT NULL COLLATE NOCASE,
     apartment_id INTEGER NOT NULL,
     creator_id INTEGER NOT NULL,
+    bought_at INTEGER,
     FOREIGN KEY (apartment_id) REFERENCES apartments(id) ON DELETE CASCADE,
     FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    paid_by_id INTEGER NOT NULL REFERENCES users(id),
+    owed_by_id INTEGER NOT NULL REFERENCES users(id),
+
+    price_cents INTEGER NOT NULL CHECK (price_cents > 0),
+    type TEXT NOT NULL CHECK (type IN ('grocery', 'transfer')),
+    grocery_id INTEGER REFERENCES groceries(id) ON DELETE SET NULL,
+    created_at INTEGER NOT NULL
 );

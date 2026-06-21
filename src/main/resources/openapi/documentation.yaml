@@ -150,6 +150,36 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "204":
           description: "No Content"
+  /api/v1/apartment/debts:
+    get:
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApartmentDebtsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/apartment/debts/settle:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettleDebtRequest"
+        required: true
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /api/v1/apartment/groceries:
     get:
       responses:
@@ -183,6 +213,25 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/v1/apartment/groceries/buy:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BuyGroceriesRequest"
+        required: true
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
   /api/v1/apartment/groceries/{groceryId}:
@@ -515,3 +564,69 @@ components:
           format: "int64"
       required:
         - "id"
+    BuyGroceriesRequest:
+      type: "object"
+      properties:
+        purchases:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GroceryPurchase"
+      required:
+        - "purchases"
+    GroceryPurchase:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        priceInCents:
+          type: "integer"
+          format: "int64"
+      required:
+        - "id"
+        - "priceInCents"
+    ApartmentDebtsResponse:
+      type: "object"
+      properties:
+        totalNetCents:
+          type: "integer"
+          format: "int64"
+        debts:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Debt"
+      required:
+        - "totalNetCents"
+        - "debts"
+    Debt:
+      type: "object"
+      properties:
+        roommate:
+          $ref: "#/components/schemas/Roommate"
+        amountCents:
+          type: "integer"
+          format: "int64"
+        relation:
+          $ref: "#/components/schemas/DebtRelation"
+      required:
+        - "roommate"
+        - "amountCents"
+        - "relation"
+    DebtRelation:
+      type: "string"
+      enum:
+        - "OWES_ME"
+        - "I_OWE"
+        - "FLAT"
+    SettleDebtRequest:
+      type: "object"
+      properties:
+        recipientId:
+          type: "integer"
+          format: "int64"
+        amountInCents:
+          type: "integer"
+          format: "int64"
+      required:
+        - "recipientId"
+        - "amountInCents"

@@ -1,0 +1,24 @@
+getApartmentIdByUserId:
+SELECT apartment_id
+FROM users
+WHERE id = :userId;
+
+checkAreRoommates:
+SELECT 1
+FROM users a
+JOIN users b ON a.apartment_id = b.apartment_id
+WHERE a.id = :userOneId
+  AND b.id = :userTwoId
+  AND a.apartment_id IS NOT NULL;
+
+insertPayment:
+INSERT INTO payments(paid_by_id, owed_by_id, price_cents, grocery_id, created_at, type)
+VALUES (
+:userId,
+:recipientId,
+:amountInCents,
+NULL ,
+:timeStamp,
+'transfer'
+)
+RETURNING id;

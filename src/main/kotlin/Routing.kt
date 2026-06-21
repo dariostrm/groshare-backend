@@ -10,6 +10,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import features.profile.profileRoutes
 import dev.jakobdario.features.groceries.groceriesRoutes
+import dev.jakobdario.features.payments.paymentRoutes
 
 fun Application.configureRouting(database: Database) {
 
@@ -26,6 +27,7 @@ fun Application.configureRouting(database: Database) {
             apartmentRoutes(database)
             inviteRoutes(database)
             groceriesRoutes(database)
+            paymentRoutes(database)
         }
     }
 }
