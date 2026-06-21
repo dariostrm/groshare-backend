@@ -61,7 +61,7 @@ fun Route.buyGroceries(database: Database) {
                             priceInCents = priceMap.getValue(grocery.id),
                             grocery = grocery.id,
                             timeStamp = timeStamp
-                        )
+                        ).executeAsOne()
                     }
                 }
             }

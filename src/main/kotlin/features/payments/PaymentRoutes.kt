@@ -6,4 +6,5 @@ import io.ktor.server.routing.Route
 fun Route.paymentRoutes(database: Database) {
     buyGroceries(database)
     getDebts(database)
+    settleDebt(database)
 }

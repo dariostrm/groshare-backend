@@ -163,6 +163,23 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+  /api/v1/apartment/debts/settle:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettleDebtRequest"
+        required: true
+      responses:
+        "204":
+          description: "No Content"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /api/v1/apartment/groceries:
     get:
       responses:
@@ -599,3 +616,15 @@ components:
         - "OWES_ME"
         - "I_OWE"
         - "FLAT"
+    SettleDebtRequest:
+      type: "object"
+      properties:
+        recipientId:
+          type: "integer"
+          format: "int64"
+        amountInCents:
+          type: "integer"
+          format: "int64"
+      required:
+        - "recipientId"
+        - "amountInCents"
