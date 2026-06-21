@@ -1,6 +1,7 @@
 deleteGrocery:
 DELETE FROM groceries
-WHERE id = :id;
+WHERE id = :id
+AND bought_at IS NULL;
 
 getGrocerysApartmentByID:
 SELECT apartment_id

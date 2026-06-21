@@ -25,8 +25,11 @@ data class GroceryPurchase(val id: Long, val priceInCents: Long) {
 
 @Serializable
 data class BuyGroceriesRequest(val purchases: List<GroceryPurchase>) {
-    fun sanitizeAndEnsureValid(): BuyGroceriesRequest =
-        BuyGroceriesRequest(purchases.map { it.sanitizeAndEnsureValid() })
+    fun sanitizeAndEnsureValid(): BuyGroceriesRequest {
+        ensure(purchases.isNotEmpty()) { "At least one purchase must be provided" }
+        ensure(purchases.distinctBy { it.id }.size == purchases.size) { "Duplicate grocery ids are not allowed" }
+        return BuyGroceriesRequest(purchases.map { it.sanitizeAndEnsureValid() })
+    }
 }
 
 fun Route.buyGroceries(database: Database) {

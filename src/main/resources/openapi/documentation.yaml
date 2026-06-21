@@ -590,6 +590,7 @@ components:
       properties:
         totalNetCents:
           type: "integer"
+          format: "int64"
         debts:
           type: "array"
           items:
@@ -604,6 +605,7 @@ components:
           $ref: "#/components/schemas/Roommate"
         amountCents:
           type: "integer"
+          format: "int64"
         relation:
           $ref: "#/components/schemas/DebtRelation"
       required:

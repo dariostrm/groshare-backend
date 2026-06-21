@@ -6,7 +6,7 @@ WHERE id = :userId;
 updateBoughtGroceries:
 UPDATE groceries
 SET bought_at = :timeStamp
-WHERE apartment_id = :aptId
+WHERE apartment_id = :aptId AND bought_at IS NULL
   AND id IN :ids
 RETURNING id, creator_id;
 

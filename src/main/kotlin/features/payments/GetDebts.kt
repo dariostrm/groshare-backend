@@ -21,13 +21,13 @@ data class Roommate(val id: Long, val username: String)
 @Serializable
 data class Debt(
     val roommate: Roommate,
-    val amountCents: Int,
+    val amountCents: Long,
     val relation: DebtRelation
 )
 
 @Serializable
 data class ApartmentDebtsResponse(
-    val totalNetCents: Int,
+    val totalNetCents: Long,
     val debts: List<Debt>
 )
 
@@ -47,10 +47,10 @@ fun Route.getDebts(database: Database) {
                 aptId = apartmentId
             ).executeAsList()
 
-            var totalNet = 0
+            var totalNet = 0L
 
             val debts = balances.map { row ->
-                val netBalance = (row.they_owe_me - row.i_owe_them).toInt()
+                val netBalance = (row.they_owe_me - row.i_owe_them).toLong()
                 totalNet += netBalance
 
                 val relation = when {
