@@ -13,16 +13,12 @@ import shared.UnauthorizedException
 import shared.UserSessionPrincipal
 
 @Serializable
-enum class DebtRelation { OWES_ME, I_OWE, FLAT }
-
-@Serializable
 data class Roommate(val id: Long, val username: String)
 
 @Serializable
 data class Debt(
     val roommate: Roommate,
-    val amountCents: Long,
-    val relation: DebtRelation
+    val amountCents: Long
 )
 
 @Serializable
@@ -53,16 +49,9 @@ fun Route.getDebts(database: Database) {
                 val netBalance = (row.they_owe_me - row.i_owe_them).toLong()
                 totalNet += netBalance
 
-                val relation = when {
-                    netBalance > 0 -> DebtRelation.OWES_ME
-                    netBalance < 0 -> DebtRelation.I_OWE
-                    else -> DebtRelation.FLAT
-                }
-
                 Debt(
                     roommate = Roommate(row.roommate_id, row.roommate_username),
-                    amountCents = kotlin.math.abs(netBalance),
-                    relation = relation
+                    amountCents = netBalance
                 )
             }
 

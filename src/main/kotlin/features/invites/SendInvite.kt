@@ -46,6 +46,10 @@ fun Route.sendInvite(database: Database) {
                     if (recipientId == session.userId)
                         throw ValidationException("You cannot invite yourself to your apartment")
 
+                    val recipientApartmentId = db.getApartmentIdByUserId(recipientId).executeAsOneOrNull()?.apartment_id
+                    if (recipientApartmentId == apartmentId)
+                        throw ValidationException("This user is already in your apartment")
+
                     db.insertInvite(
                         apartmentId = apartmentId,
                         inviterId = session.userId,

@@ -605,19 +605,10 @@ components:
           $ref: "#/components/schemas/Roommate"
         amountCents:
           type: "integer"
-          format: "int64"
-        relation:
-          $ref: "#/components/schemas/DebtRelation"
+          description: "Positive if they owe me, negative if I owe them."
       required:
         - "roommate"
         - "amountCents"
-        - "relation"
-    DebtRelation:
-      type: "string"
-      enum:
-        - "OWES_ME"
-        - "I_OWE"
-        - "FLAT"
     SettleDebtRequest:
       type: "object"
       properties:
