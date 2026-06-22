@@ -55,3 +55,11 @@ CREATE TABLE IF NOT EXISTS payments (
     grocery_id INTEGER REFERENCES groceries(id) ON DELETE SET NULL,
     created_at INTEGER NOT NULL
 );
+--
+-- CREATE INDEX IF NOT EXISTS idx_users_apartment_id ON users(apartment_id);
+-- CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+-- CREATE INDEX IF NOT EXISTS idx_groceries_apartment_id ON groceries(apartment_id);
+-- CREATE INDEX IF NOT EXISTS idx_groceries_creator_id ON groceries(creator_id);
+-- CREATE INDEX IF NOT EXISTS idx_invites_invited_user_id ON invites(invited_user_id);
+-- CREATE INDEX IF NOT EXISTS idx_payments_paid_by_id ON payments(paid_by_id);
+-- CREATE INDEX IF NOT EXISTS idx_payments_owed_by_id ON payments(owed_by_id);
