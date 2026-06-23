@@ -1,40 +1,65 @@
 # groshare-backend
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+This is the backend for the GroShare application, built with [Ktor](https://ktor.io).
 
-Here are some useful links to get you started:
+## Build & Deploy from Source
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+Follow these steps to get the application up and running.
 
-## Features
+<details>
+<summary><b>Option 1: Using Docker</b></summary>
 
-Here's a list of features included in this project:
+### Dependencies
+- **Docker & Docker Compose**: [Install Docker](https://docs.docker.com/get-docker/)
 
-| Name                                               | Description                                                 |
-|----------------------------------------------------|-------------------------------------------------------------|
-| [Routing](https://start.ktor.io/p/routing-default) | Allows to define structured routes and associated handlers. |
-
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-|-----------------------------------------|----------------------------------------------------------------------|
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
-```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
+### Steps
+(Clone the repo if you did not already)
+```bash
+git clone https://github.com/dariostrm/groshare-backend.git
+cd groshare-backend
 ```
 
+1. **Prepare the network**: The configuration expects an external network named `groshare_network`. Create it by running:
+   ```bash
+   docker network create groshare_network
+   ```
+2. **Launch the app**: Run the following command in the root directory:
+   ```bash
+   docker compose up -d
+   ```
+The backend will be available on port `9090`. Data is persisted in `~/groshare/data`.
+</details>
+
+<details>
+<summary><b>Option 2: Local Machine (Gradle)</b></summary>
+
+### Dependencies
+- **JDK 21**: [Download from Oracle](https://www.oracle.com/java/technologies/downloads/) or use [SDKMAN!](https://sdkman.io/)
+- **Gradle**: Included via `./gradlew` wrapper.
+
+### Steps
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/dariostrm/groshare-backend.git
+   cd groshare-backend
+   ```
+2. **Run the application**: Execute the following command:
+   ```bash
+   ./gradlew run
+   ```
+The backend will start and listen on the port configured in `src/main/resources/application.yaml` (default is `8080`).
+
+3. **(Optional) Build Fat JAR**: To create a standalone executable:
+   ```bash
+   ./gradlew buildFatJar
+   ```
+The JAR will be located in `build/libs/`.
+</details>
+
+## Useful Commands
+
+| Task | Command |
+|------|---------|
+| Build project | `./gradlew build` |
+| Run backend locally | `./gradlew run` |
+| Build executable JAR | `./gradlew buildFatJar` |
